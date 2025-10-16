@@ -13,9 +13,19 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://zerikc.github.io">
     
-    <!-- Apple Touch Icon -->
+    <!-- Icons -->
     <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
     <link rel="icon" type="image/png" href="images/favicon.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#007AFF">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Zerikc Apps">
     
     <title>Zerikc Apps - iOS Developer</title>
     <link rel="stylesheet" href="css/styles.css">
@@ -75,6 +85,12 @@
                     заботы о здоровье и повышения продуктивности
                 </p>
                 <div class="hero-buttons">
+                    <button id="installButton" class="btn btn-primary install-btn" style="display: none;">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                        </svg>
+                        Установить приложение
+                    </button>
                     <a href="#apps" class="btn btn-primary">Посмотреть приложения</a>
                     <a href="#contact" class="btn btn-secondary">Связаться со мной</a>
                 </div>

@@ -6,6 +6,187 @@
     'use strict';
 
     // ================================
+    // PWA - Service Worker Registration
+    // ================================
+    
+    let deferredPrompt;
+    const installButton = document.getElementById('installButton');
+    
+    // Регистрация Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker
+                .register('/sw.js')
+                .then((registration) => {
+                    console.log('✅ Service Worker registered:', registration.scope);
+                    
+                    // Проверка обновлений каждые 60 секунд
+                    setInterval(() => {
+                        registration.update();
+                    }, 60000);
+                    
+                    // Обработка обновлений
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                // Показать уведомление о доступном обновлении
+                                showUpdateNotification();
+                            }
+                        });
+                    });
+                })
+                .catch((error) => {
+                    console.error('❌ Service Worker registration failed:', error);
+                });
+        });
+    }
+    
+    // Обработка события установки PWA
+    window.addEventListener('beforeinstallprompt', (e) => {
+        console.log('💾 Install prompt fired');
+        // Предотвращаем автоматический показ промпта
+        e.preventDefault();
+        // Сохраняем событие для использования позже
+        deferredPrompt = e;
+        // Показываем кнопку установки
+        if (installButton) {
+            installButton.style.display = 'inline-flex';
+        }
+    });
+    
+    // Обработка клика по кнопке установки
+    if (installButton) {
+        installButton.addEventListener('click', async () => {
+            if (!deferredPrompt) {
+                console.log('❌ No install prompt available');
+                return;
+            }
+            
+            // Показываем промпт установки
+            deferredPrompt.prompt();
+            
+            // Ждем выбора пользователя
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`👤 User choice: ${outcome}`);
+            
+            if (outcome === 'accepted') {
+                console.log('✅ User accepted the install prompt');
+                // Скрываем кнопку после установки
+                installButton.style.display = 'none';
+            } else {
+                console.log('❌ User dismissed the install prompt');
+            }
+            
+            // Очищаем сохраненный промпт
+            deferredPrompt = null;
+        });
+    }
+    
+    // Отслеживание успешной установки
+    window.addEventListener('appinstalled', (evt) => {
+        console.log('🎉 App installed successfully');
+        
+        // Скрываем кнопку установки
+        if (installButton) {
+            installButton.style.display = 'none';
+        }
+        
+        // Показываем уведомление
+        showInstallSuccessMessage();
+        
+        // Отправляем событие в аналитику (если есть)
+        if (window.gtag) {
+            gtag('event', 'pwa_installed', {
+                event_category: 'PWA',
+                event_label: 'App Installed'
+            });
+        }
+    });
+    
+    // Функция для показа уведомления об обновлении
+    function showUpdateNotification() {
+        const notification = document.createElement('div');
+        notification.innerHTML = `
+            <div style="
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: linear-gradient(135deg, #007AFF, #5856D6);
+                color: white;
+                padding: 16px 24px;
+                border-radius: 12px;
+                font-size: 14px;
+                font-weight: 600;
+                z-index: 10000;
+                box-shadow: 0 8px 24px rgba(0, 122, 255, 0.4);
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                animation: slideUp 0.3s ease;
+            ">
+                <span>Доступно обновление!</span>
+                <button onclick="window.location.reload()" style="
+                    background: rgba(255, 255, 255, 0.2);
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    color: white;
+                    padding: 8px 16px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-weight: 600;
+                ">
+                    Обновить
+                </button>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Автоматически убираем через 10 секунд
+        setTimeout(() => {
+            notification.remove();
+        }, 10000);
+    }
+    
+    // Функция для показа сообщения об успешной установке
+    function showInstallSuccessMessage() {
+        const message = document.createElement('div');
+        message.textContent = '🎉 Приложение успешно установлено!';
+        message.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #34C759, #30D158);
+            color: white;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 10000;
+            box-shadow: 0 8px 24px rgba(52, 199, 89, 0.4);
+            animation: slideUp 0.3s ease;
+        `;
+        
+        document.body.appendChild(message);
+        
+        setTimeout(() => {
+            message.style.animation = 'slideDown 0.3s ease';
+            setTimeout(() => message.remove(), 300);
+        }, 3000);
+    }
+    
+    // Проверка, установлено ли приложение
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+        console.log('✅ Running in standalone mode');
+        // Скрываем кнопку установки, если уже установлено
+        if (installButton) {
+            installButton.style.display = 'none';
+        }
+    }
+
+    // ================================
     // Theme Management
     // ================================
     
