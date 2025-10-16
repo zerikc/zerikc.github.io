@@ -1,4 +1,4 @@
-# Portfolio Landing Page - VS Apps
+# Portfolio Landing Page - Zerikc Apps
 
 Современный сайт-портфолио для iOS приложений, готовый для размещения на GitHub Pages.
 

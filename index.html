@@ -8,7 +8,7 @@
     <meta name="author" content="Владислав Сидельников">
     
     <!-- Open Graph -->
-    <meta property="og:title" content="Владислав Сидельников - iOS Developer">
+    <meta property="og:title" content="Zerikc Apps - iOS Developer">
     <meta property="og:description" content="Портфолио iOS разработчика. Приложения для умного дома, здоровья и управления задачами.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://zerikc.github.io">
@@ -17,7 +17,7 @@
     <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
     <link rel="icon" type="image/png" href="images/favicon.png">
     
-    <title>Владислав Сидельников - iOS Developer</title>
+    <title>Zerikc Apps - iOS Developer</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -26,7 +26,7 @@
         <div class="container">
             <div class="nav-brand">
                 <span class="brand-icon">📱</span>
-                <span class="brand-name">VS Apps</span>
+                <span class="brand-name">Zerikc Apps</span>
             </div>
             <button class="nav-toggle" id="navToggle" aria-label="Открыть меню">
                 <span></span>
@@ -93,8 +93,7 @@
                         <h3 class="app-title">Watch Weather</h3>
                         <p class="app-tagline">Погода на вашем запястье</p>
                         <p class="app-description">
-                            Красивое приложение погоды для Apple Watch и iPhone с анимированными фонами и иконками. 
-                            Использует Apple WeatherKit для точных прогнозов и автоматическое определение местоположения.
+                            Прогноз погоды для Apple Watch и iPhone с данными от Apple WeatherKit.
                         </p>
                         <div class="app-features">
                             <span class="feature-tag">iOS</span>
@@ -130,8 +129,7 @@
                         <h3 class="app-title">Homie</h3>
                         <p class="app-tagline">Универсальное управление умным домом</p>
                         <p class="app-description">
-                            Приложение для управления HomeKit устройствами на iPhone, iPad и Apple TV. 
-                            Поддержка 15+ типов устройств с минималистичным дизайном в стиле Apple.
+                            Управление умным домом через HomeKit на iOS, iPadOS и tvOS.
                         </p>
                         <div class="app-features">
                             <span class="feature-tag">iOS</span>
@@ -167,8 +165,7 @@
                         <h3 class="app-title">Floralia</h3>
                         <p class="app-tagline">Забота о женском здоровье</p>
                         <p class="app-description">
-                            Приложение для отслеживания менструального цикла с дневником настроения, 
-                            графиками и прогнозами. Работает локально с опциональной облачной синхронизацией.
+                            Отслеживание цикла с дневником и прогнозами. Данные хранятся локально или в iCloud.
                         </p>
                         <div class="app-features">
                             <span class="feature-tag">iOS</span>
@@ -203,8 +200,7 @@
                         <h3 class="app-title">CheckList</h3>
                         <p class="app-tagline">Умное управление задачами</p>
                         <p class="app-description">
-                            Профессиональное приложение для создания и управления чек-листами. 
-                            Синхронизация через Firebase, уведомления и экспорт в PDF.
+                            Создание и управление чек-листами с синхронизацией и уведомлениями.
                         </p>
                         <div class="app-features">
                             <span class="feature-tag">iOS</span>
@@ -242,58 +238,24 @@
                 </p>
             </div>
 
-            <div class="contact-content">
-                <div class="contact-info">
-                    <div class="contact-card">
-                        <div class="contact-icon">📧</div>
-                        <h3>Email</h3>
-                        <a href="mailto:support@vsapps.ru">support@vsapps.ru</a>
-                    </div>
-
-                    <div class="contact-card">
-                        <div class="contact-icon">💼</div>
-                        <h3>GitHub</h3>
-                        <a href="https://github.com/zerikc" target="_blank" rel="noopener">github.com/zerikc</a>
-                    </div>
-
-                    <div class="contact-card">
-                        <div class="contact-icon">🌐</div>
-                        <h3>Локация</h3>
-                        <p>Россия</p>
-                    </div>
+            <div class="contact-cards">
+                <div class="contact-card">
+                    <div class="contact-icon">📧</div>
+                    <h3>Email</h3>
+                    <a href="mailto:support@vsapps.ru">support@vsapps.ru</a>
                 </div>
 
-                <form class="contact-form" id="contactForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
-                    <div class="form-group">
-                        <label for="name">Имя</label>
-                        <input type="text" id="name" name="name" required placeholder="Ваше имя">
-                    </div>
+                <div class="contact-card">
+                    <div class="contact-icon">💼</div>
+                    <h3>GitHub</h3>
+                    <a href="https://github.com/zerikc" target="_blank" rel="noopener">github.com/zerikc</a>
+                </div>
 
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" required placeholder="your@email.com">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="subject">Тема</label>
-                        <select id="subject" name="subject" required>
-                            <option value="">Выберите тему</option>
-                            <option value="support">Техническая поддержка</option>
-                            <option value="feature">Предложение функции</option>
-                            <option value="bug">Сообщить об ошибке</option>
-                            <option value="other">Другое</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="message">Сообщение</label>
-                        <textarea id="message" name="message" required placeholder="Ваше сообщение..." rows="5"></textarea>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary btn-block">Отправить сообщение</button>
-                    
-                    <div class="form-message" id="formMessage"></div>
-                </form>
+                <div class="contact-card">
+                    <div class="contact-icon">🌐</div>
+                    <h3>Локация</h3>
+                    <p>Россия</p>
+                </div>
             </div>
         </div>
     </section>
@@ -303,7 +265,7 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h4>VS Apps</h4>
+                    <h4>Zerikc Apps</h4>
                     <p>Создаю приложения для iOS с 2025 года</p>
                 </div>
 
