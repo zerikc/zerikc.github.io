@@ -462,42 +462,93 @@ body {
     flex-wrap: wrap;
 }
 
-.scroll-indicator {
-    position: absolute;
-    bottom: var(--spacing-xl);
-    left: 50%;
-    transform: translateX(-50%);
-    animation: bounce 2s infinite;
+/* ================================
+   Section Dots Navigation
+   ================================ */
+
+.section-dots {
+    position: fixed;
+    right: var(--spacing-lg);
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
 }
 
-.mouse {
-    width: 24px;
-    height: 40px;
-    border: 2px solid var(--text-secondary);
-    border-radius: 12px;
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    border: 2px solid transparent;
+    transition: all var(--transition-fast);
     position: relative;
+    cursor: pointer;
 }
 
-.wheel {
-    width: 4px;
-    height: 8px;
-    background: var(--text-secondary);
-    border-radius: 2px;
+.dot::before {
+    content: '';
     position: absolute;
-    top: 8px;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
-    animation: wheel 2s infinite;
+    transform: translate(-50%, -50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
 }
 
-@keyframes bounce {
-    0%, 100% { transform: translate(-50%, 0); }
-    50% { transform: translate(-50%, 10px); }
+.dot:hover {
+    background: rgba(255, 255, 255, 0.5);
+    transform: scale(1.2);
 }
 
-@keyframes wheel {
-    0% { opacity: 1; top: 8px; }
-    100% { opacity: 0; top: 20px; }
+.dot.active {
+    background: transparent;
+    border-color: var(--primary-color);
+}
+
+.dot.active::before {
+    opacity: 1;
+}
+
+[data-theme="light"] .dot {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="light"] .dot:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+@media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) .dot {
+        background: rgba(0, 0, 0, 0.2);
+    }
+    
+    :root:not([data-theme="dark"]) .dot:hover {
+        background: rgba(0, 0, 0, 0.3);
+    }
+}
+
+@media (max-width: 768px) {
+    .section-dots {
+        right: var(--spacing-sm);
+        gap: var(--spacing-xs);
+    }
+    
+    .dot {
+        width: 10px;
+        height: 10px;
+    }
+    
+    .dot::before {
+        width: 4px;
+        height: 4px;
+    }
 }
 
 /* ================================

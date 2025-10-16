@@ -270,6 +270,13 @@
     window.addEventListener('scroll', debounce(updateScrollProgress, 5));
     
     // ================================
+    // Section References (shared)
+    // ================================
+    
+    const sections = document.querySelectorAll('section[id]');
+    const dots = document.querySelectorAll('.dot');
+    
+    // ================================
     // Parallax Effect for Gradient Orbs
     // ================================
     
@@ -323,8 +330,6 @@
     // ================================
     // Active Navigation Link Highlighting
     // ================================
-    
-    const sections = document.querySelectorAll('section[id]');
     
     function highlightNavigation() {
         const scrollY = window.pageYOffset;
@@ -408,24 +413,49 @@
     window.addEventListener('scroll', debounce(updateScrollProgress));
     
     // ================================
-    // Scroll Indicator Fade
+    // Section Dots Navigation
     // ================================
     
-    const scrollIndicator = document.querySelector('.scroll-indicator');
-    
-    if (scrollIndicator) {
-        window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            const opacity = Math.max(0, 1 - scrolled / 300);
-            scrollIndicator.style.opacity = opacity;
+    // Update active dot on scroll
+    function updateActiveDot() {
+        const scrollY = window.pageYOffset + 200;
+        
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.offsetHeight;
+            const sectionId = section.getAttribute('id');
             
-            if (scrolled > 500) {
-                scrollIndicator.style.display = 'none';
-            } else {
-                scrollIndicator.style.display = 'block';
+            if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
+                dots.forEach(dot => {
+                    dot.classList.remove('active');
+                    if (dot.getAttribute('data-section') === sectionId) {
+                        dot.classList.add('active');
+                    }
+                });
             }
         });
     }
+    
+    // Smooth scroll on dot click
+    dots.forEach(dot => {
+        dot.addEventListener('click', (e) => {
+            e.preventDefault();
+            const sectionId = dot.getAttribute('data-section');
+            const section = document.getElementById(sectionId);
+            
+            if (section) {
+                const navbarHeight = document.getElementById('navbar').offsetHeight;
+                const targetPosition = section.getBoundingClientRect().top + window.pageYOffset - navbarHeight;
+                
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+    
+    window.addEventListener('scroll', debounce(updateActiveDot, 10));
     
     // ================================
     // Page Load Animation
