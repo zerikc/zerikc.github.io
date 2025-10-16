@@ -114,12 +114,6 @@
         observer.observe(card);
     });
     
-    // Animate feature cards
-    document.querySelectorAll('.feature-card').forEach(card => {
-        card.setAttribute('data-animate', '');
-        observer.observe(card);
-    });
-    
     // ================================
     // Contact Form Handling
     // ================================
