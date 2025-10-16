@@ -440,16 +440,20 @@ section {
     background: var(--bg-secondary);
 }
 
+.apps .container {
+    max-width: 1400px;
+}
+
 .apps-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: var(--spacing-lg);
+    gap: var(--spacing-md);
 }
 
 .app-card {
     background: var(--bg-card);
-    border-radius: var(--radius-xl);
-    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
     border: 1px solid rgba(255, 255, 255, 0.05);
     transition: var(--transition-normal);
     position: relative;
@@ -479,10 +483,10 @@ section {
 }
 
 .app-icon {
-    width: 80px;
-    height: 80px;
-    border-radius: var(--radius-lg);
-    margin-bottom: var(--spacing-lg);
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-md);
     overflow: hidden;
     box-shadow: var(--shadow-lg);
 }
@@ -504,29 +508,30 @@ section {
 }
 
 .app-title {
-    font-size: var(--font-size-2xl);
+    font-size: var(--font-size-xl);
     font-weight: 700;
     margin-bottom: var(--spacing-xs);
 }
 
 .app-tagline {
-    font-size: var(--font-size-base);
+    font-size: var(--font-size-sm);
     color: var(--text-secondary);
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
     font-weight: 500;
 }
 
 .app-description {
     color: var(--text-secondary);
-    line-height: 1.7;
-    margin-bottom: var(--spacing-lg);
+    line-height: 1.6;
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-sm);
 }
 
 .app-features {
     display: flex;
     flex-wrap: wrap;
     gap: var(--spacing-xs);
-    margin-bottom: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
 }
 
 .feature-tag {
@@ -542,27 +547,27 @@ section {
 .app-stats {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
 }
 
 .stat {
     text-align: center;
-    padding: var(--spacing-md);
+    padding: var(--spacing-sm);
     background: rgba(255, 255, 255, 0.03);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
 }
 
 .stat-value {
     display: block;
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-lg);
     font-weight: 700;
-    margin-bottom: var(--spacing-xs);
+    margin-bottom: 0.25rem;
 }
 
 .stat-label {
     display: block;
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-xs);
     color: var(--text-secondary);
 }
 
