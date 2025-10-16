@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Портфолио iOS разработчика Владислава Сидельникова. Приложения для умного дома, здоровья и управления задачами.">
+    <meta name="keywords" content="iOS, приложения, HomeKit, здоровье, чек-листы, App Store">
+    <meta name="author" content="Владислав Сидельников">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Владислав Сидельников - iOS Developer">
+    <meta property="og:description" content="Портфолио iOS разработчика. Приложения для умного дома, здоровья и управления задачами.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://zerikc.github.io">
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    
+    <title>Владислав Сидельников - iOS Developer</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <span class="brand-icon">📱</span>
+                <span class="brand-name">VS Apps</span>
+            </div>
+            <button class="nav-toggle" id="navToggle" aria-label="Открыть меню">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#home" class="nav-link">Главная</a></li>
+                <li><a href="#apps" class="nav-link">Приложения</a></li>
+                <li><a href="#features" class="nav-link">Преимущества</a></li>
+                <li><a href="#contact" class="nav-link">Контакты</a></li>
+                <li><a href="privacy.html" class="nav-link">Конфиденциальность</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-background">
+            <div class="gradient-orb orb-1"></div>
+            <div class="gradient-orb orb-2"></div>
+            <div class="gradient-orb orb-3"></div>
+        </div>
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    <span class="title-line">Приложения для iOS,</span>
+                    <span class="title-line gradient-text">созданные с заботой</span>
+                </h1>
+                <p class="hero-description">
+                    Разрабатываю современные приложения для управления умным домом, 
+                    заботы о здоровье и повышения продуктивности
+                </p>
+                <div class="hero-buttons">
+                    <a href="#apps" class="btn btn-primary">Посмотреть приложения</a>
+                    <a href="#contact" class="btn btn-secondary">Связаться со мной</a>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <div class="mouse">
+                <div class="wheel"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Apps Section -->
+    <section class="apps" id="apps">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Мои приложения</h2>
+                <p class="section-description">
+                    Каждое приложение создано с вниманием к деталям и удобству пользователя
+                </p>
+            </div>
+
+            <div class="apps-grid">
+                <!-- Watch Weather App -->
+                <div class="app-card" data-app="weather">
+                    <div class="app-icon">
+                        <img src="images/weather-icon.png" alt="Watch Weather" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                        <div class="app-icon-fallback" style="display: none;">⛅</div>
+                    </div>
+                    <div class="app-content">
+                        <h3 class="app-title">Watch Weather</h3>
+                        <p class="app-tagline">Погода на вашем запястье</p>
+                        <p class="app-description">
+                            Красивое приложение погоды для Apple Watch и iPhone с анимированными фонами и иконками. 
+                            Использует Apple WeatherKit для точных прогнозов и автоматическое определение местоположения.
+                        </p>
+                        <div class="app-features">
+                            <span class="feature-tag">iOS</span>
+                            <span class="feature-tag">watchOS</span>
+                            <span class="feature-tag">WeatherKit</span>
+                            <span class="feature-tag">Анимации</span>
+                        </div>
+                        <div class="app-stats">
+                            <div class="stat">
+                                <span class="stat-value">⌚</span>
+                                <span class="stat-label">Apple Watch</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">🎨</span>
+                                <span class="stat-label">анимации</span>
+                            </div>
+                        </div>
+                        <div class="app-links">
+                            <a href="#" class="app-store-badge" target="_blank" rel="noopener">
+                                <span>Скоро в App Store</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Homie App -->
+                <div class="app-card" data-app="homie">
+                    <div class="app-icon">
+                        <img src="images/homie-icon.png" alt="Homie" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                        <div class="app-icon-fallback" style="display: none;">🏠</div>
+                    </div>
+                    <div class="app-content">
+                        <h3 class="app-title">Homie</h3>
+                        <p class="app-tagline">Универсальное управление умным домом</p>
+                        <p class="app-description">
+                            Приложение для управления HomeKit устройствами на iPhone, iPad и Apple TV. 
+                            Поддержка 15+ типов устройств с минималистичным дизайном в стиле Apple.
+                        </p>
+                        <div class="app-features">
+                            <span class="feature-tag">iOS</span>
+                            <span class="feature-tag">iPadOS</span>
+                            <span class="feature-tag">tvOS</span>
+                            <span class="feature-tag">HomeKit</span>
+                        </div>
+                        <div class="app-stats">
+                            <div class="stat">
+                                <span class="stat-value">15+</span>
+                                <span class="stat-label">типов устройств</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">3</span>
+                                <span class="stat-label">платформы</span>
+                            </div>
+                        </div>
+                        <div class="app-links">
+                            <a href="#" class="app-store-badge" target="_blank" rel="noopener">
+                                <span>Скоро в App Store</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Floralia App -->
+                <div class="app-card" data-app="floralia">
+                    <div class="app-icon">
+                        <img src="images/floralia-icon.png" alt="Floralia" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                        <div class="app-icon-fallback" style="display: none;">🌸</div>
+                    </div>
+                    <div class="app-content">
+                        <h3 class="app-title">Floralia</h3>
+                        <p class="app-tagline">Забота о женском здоровье</p>
+                        <p class="app-description">
+                            Приложение для отслеживания менструального цикла с дневником настроения, 
+                            графиками и прогнозами. Работает локально с опциональной облачной синхронизацией.
+                        </p>
+                        <div class="app-features">
+                            <span class="feature-tag">iOS</span>
+                            <span class="feature-tag">Здоровье</span>
+                            <span class="feature-tag">Privacy First</span>
+                        </div>
+                        <div class="app-stats">
+                            <div class="stat">
+                                <span class="stat-value">100%</span>
+                                <span class="stat-label">приватность</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">📊</span>
+                                <span class="stat-label">аналитика</span>
+                            </div>
+                        </div>
+                        <div class="app-links">
+                            <a href="#" class="app-store-badge" target="_blank" rel="noopener">
+                                <span>Скоро в App Store</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CheckList App -->
+                <div class="app-card" data-app="checklist">
+                    <div class="app-icon">
+                        <img src="images/checklist-icon.png" alt="CheckList" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                        <div class="app-icon-fallback" style="display: none;">✓</div>
+                    </div>
+                    <div class="app-content">
+                        <h3 class="app-title">CheckList</h3>
+                        <p class="app-tagline">Умное управление задачами</p>
+                        <p class="app-description">
+                            Профессиональное приложение для создания и управления чек-листами. 
+                            Синхронизация через Firebase, уведомления и экспорт в PDF.
+                        </p>
+                        <div class="app-features">
+                            <span class="feature-tag">iOS</span>
+                            <span class="feature-tag">Продуктивность</span>
+                            <span class="feature-tag">Синхронизация</span>
+                        </div>
+                        <div class="app-stats">
+                            <div class="stat">
+                                <span class="stat-value">☁️</span>
+                                <span class="stat-label">облако</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">🔔</span>
+                                <span class="stat-label">уведомления</span>
+                            </div>
+                        </div>
+                        <div class="app-links">
+                            <a href="#" class="app-store-badge" target="_blank" rel="noopener">
+                                <span>Скоро в App Store</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Почему мои приложения</h2>
+                <p class="section-description">
+                    Каждая деталь продумана для максимального комфорта
+                </p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3 class="feature-title">Современный дизайн</h3>
+                    <p class="feature-description">
+                        Минималистичный интерфейс в стиле Apple с вниманием к каждой детали
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title">Приватность</h3>
+                    <p class="feature-description">
+                        Ваши данные защищены. Локальное хранение и шифрование по умолчанию
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Производительность</h3>
+                    <p class="feature-description">
+                        Оптимизированный код на Swift обеспечивает плавную работу на всех устройствах
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">♿</div>
+                    <h3 class="feature-title">Доступность</h3>
+                    <p class="feature-description">
+                        Полная поддержка VoiceOver, Dynamic Type и режимов для слабовидящих
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🌙</div>
+                    <h3 class="feature-title">Темная тема</h3>
+                    <p class="feature-description">
+                        Красивая темная тема, которая адаптируется под системные настройки
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3 class="feature-title">Обновления</h3>
+                    <p class="feature-description">
+                        Регулярные обновления с новыми функциями и улучшениями
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Связаться со мной</h2>
+                <p class="section-description">
+                    Есть вопросы или предложения? Буду рад обсудить!
+                </p>
+            </div>
+
+            <div class="contact-content">
+                <div class="contact-info">
+                    <div class="contact-card">
+                        <div class="contact-icon">📧</div>
+                        <h3>Email</h3>
+                        <a href="mailto:support@vsapps.ru">support@vsapps.ru</a>
+                    </div>
+
+                    <div class="contact-card">
+                        <div class="contact-icon">💼</div>
+                        <h3>GitHub</h3>
+                        <a href="https://github.com/zerikc" target="_blank" rel="noopener">github.com/zerikc</a>
+                    </div>
+
+                    <div class="contact-card">
+                        <div class="contact-icon">🌐</div>
+                        <h3>Локация</h3>
+                        <p>Россия</p>
+                    </div>
+                </div>
+
+                <form class="contact-form" id="contactForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+                    <div class="form-group">
+                        <label for="name">Имя</label>
+                        <input type="text" id="name" name="name" required placeholder="Ваше имя">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required placeholder="your@email.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject">Тема</label>
+                        <select id="subject" name="subject" required>
+                            <option value="">Выберите тему</option>
+                            <option value="support">Техническая поддержка</option>
+                            <option value="feature">Предложение функции</option>
+                            <option value="bug">Сообщить об ошибке</option>
+                            <option value="other">Другое</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">Сообщение</label>
+                        <textarea id="message" name="message" required placeholder="Ваше сообщение..." rows="5"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">Отправить сообщение</button>
+                    
+                    <div class="form-message" id="formMessage"></div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>VS Apps</h4>
+                    <p>Создаю приложения для iOS с 2025 года</p>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Приложения</h4>
+                    <ul class="footer-links">
+                        <li><a href="#apps">Watch Weather</a></li>
+                        <li><a href="#apps">Homie</a></li>
+                        <li><a href="#apps">Floralia</a></li>
+                        <li><a href="#apps">CheckList</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Информация</h4>
+                    <ul class="footer-links">
+                        <li><a href="privacy.html">Политика конфиденциальности</a></li>
+                        <li><a href="terms.html">Условия использования</a></li>
+                        <li><a href="#contact">Поддержка</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Следите за обновлениями</h4>
+                    <div class="social-links">
+                        <a href="https://github.com/zerikc" target="_blank" rel="noopener" aria-label="GitHub">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2025 Владислав Сидельников. Все права защищены.</p>
+                <p class="footer-note">Сделано с ❤️ для iOS сообщества</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
+
