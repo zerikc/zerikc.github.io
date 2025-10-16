@@ -6,6 +6,55 @@
     'use strict';
 
     // ================================
+    // Theme Management
+    // ================================
+    
+    // Initialize theme on page load
+    function initTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme) {
+            setTheme(savedTheme, false);
+        } else if (!systemPrefersDark) {
+            setTheme('light', false);
+        } else {
+            setTheme('dark', false);
+        }
+    }
+    
+    // Set theme
+    function setTheme(theme, save = true) {
+        document.documentElement.setAttribute('data-theme', theme);
+        if (save) {
+            localStorage.setItem('theme', theme);
+        }
+    }
+    
+    // Toggle theme
+    function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        setTheme(newTheme);
+    }
+    
+    // Listen for system theme changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!localStorage.getItem('theme')) {
+            setTheme(e.matches ? 'dark' : 'light', false);
+        }
+    });
+    
+    // Initialize theme immediately
+    initTheme();
+    
+    // Theme toggle button
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+    }
+
+    // ================================
     // Mobile Navigation Toggle
     // ================================
     
