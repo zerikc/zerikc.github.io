@@ -96,7 +96,7 @@
     
     const observerOptions = {
         threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
+        rootMargin: '0px 0px -80px 0px'
     };
     
     const observer = new IntersectionObserver((entries) => {
@@ -108,11 +108,36 @@
         });
     }, observerOptions);
     
-    // Animate app cards
-    document.querySelectorAll('.app-card').forEach(card => {
+    // Animate app cards with stagger effect
+    document.querySelectorAll('.app-card').forEach((card, index) => {
         card.setAttribute('data-animate', '');
+        card.style.transitionDelay = `${index * 0.1}s`;
         observer.observe(card);
     });
+    
+    // Animate contact cards
+    document.querySelectorAll('.contact-card').forEach((card, index) => {
+        card.setAttribute('data-animate', '');
+        card.style.transitionDelay = `${index * 0.15}s`;
+        observer.observe(card);
+    });
+    
+    // Animate section headers
+    document.querySelectorAll('.section-header').forEach(header => {
+        header.setAttribute('data-animate', '');
+        observer.observe(header);
+    });
+    
+    // Animate hero content
+    const heroContent = document.querySelector('.hero-content');
+    if (heroContent) {
+        const heroElements = heroContent.querySelectorAll('.hero-title, .hero-description, .hero-buttons');
+        heroElements.forEach((element, index) => {
+            element.setAttribute('data-animate', '');
+            element.style.transitionDelay = `${index * 0.2}s`;
+            observer.observe(element);
+        });
+    }
     
     // ================================
     // Contact Form Handling
@@ -175,23 +200,76 @@
     // App Card Hover Effects
     // ================================
     
-    // Simple hover effect without 3D transform
-    // Cards will lift up on hover with shadow - handled by CSS
+    // Simple hover effect - handled by CSS
     
     // ================================
-    // Scroll Progress Indicator
+    // Scroll Progress Bar
     // ================================
+    
+    const scrollProgress = document.getElementById('scrollProgress');
     
     function updateScrollProgress() {
         const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
         const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        const scrolled = (winScroll / height) * 100;
+        const scrolled = (winScroll / height);
         
-        // You can add a progress bar element if needed
-        // progressBar.style.width = scrolled + '%';
+        if (scrollProgress) {
+            scrollProgress.style.transform = `scaleX(${scrolled})`;
+        }
     }
     
-    window.addEventListener('scroll', updateScrollProgress);
+    window.addEventListener('scroll', debounce(updateScrollProgress, 5));
+    
+    // ================================
+    // Parallax Effect for Gradient Orbs
+    // ================================
+    
+    const gradientOrbs = document.querySelectorAll('.gradient-orb');
+    const heroSection = document.querySelector('.hero');
+    
+    if (heroSection) {
+        heroSection.addEventListener('mousemove', (e) => {
+            const { clientX, clientY } = e;
+            const { innerWidth, innerHeight } = window;
+            
+            const xPos = (clientX / innerWidth) - 0.5;
+            const yPos = (clientY / innerHeight) - 0.5;
+            
+            gradientOrbs.forEach((orb, index) => {
+                const speed = (index + 1) * 20;
+                const x = xPos * speed;
+                const y = yPos * speed;
+                
+                orb.style.transform = `translate(${x}px, ${y}px)`;
+            });
+        });
+        
+        heroSection.addEventListener('mouseleave', () => {
+            gradientOrbs.forEach(orb => {
+                orb.style.transform = 'translate(0, 0)';
+            });
+        });
+    }
+    
+    // Parallax on scroll with RAF for performance
+    let ticking = false;
+    
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            window.requestAnimationFrame(() => {
+                const scrolled = window.pageYOffset;
+                
+                gradientOrbs.forEach((orb, index) => {
+                    const speed = (index + 1) * 0.15;
+                    orb.style.transform = `translateY(${scrolled * speed}px)`;
+                });
+                
+                ticking = false;
+            });
+            
+            ticking = true;
+        }
+    });
     
     // ================================
     // Active Navigation Link Highlighting
@@ -281,11 +359,39 @@
     window.addEventListener('scroll', debounce(updateScrollProgress));
     
     // ================================
+    // Scroll Indicator Fade
+    // ================================
+    
+    const scrollIndicator = document.querySelector('.scroll-indicator');
+    
+    if (scrollIndicator) {
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const opacity = Math.max(0, 1 - scrolled / 300);
+            scrollIndicator.style.opacity = opacity;
+            
+            if (scrolled > 500) {
+                scrollIndicator.style.display = 'none';
+            } else {
+                scrollIndicator.style.display = 'block';
+            }
+        });
+    }
+    
+    // ================================
     // Page Load Animation
     // ================================
     
     window.addEventListener('load', () => {
         document.body.classList.add('loaded');
+        
+        // Add fade-in effect to body
+        document.body.style.opacity = '0';
+        document.body.style.transition = 'opacity 0.5s ease';
+        
+        setTimeout(() => {
+            document.body.style.opacity = '1';
+        }, 100);
         
         // Trigger initial animations
         highlightNavigation();

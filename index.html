@@ -21,11 +21,18 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+    
     <!-- Navigation -->
     <nav class="navbar" id="navbar">
         <div class="container">
             <div class="nav-brand">
-                <span class="brand-icon">📱</span>
+                <span class="brand-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
+                    </svg>
+                </span>
                 <span class="brand-name">Zerikc Apps</span>
             </div>
             <button class="nav-toggle" id="navToggle" aria-label="Открыть меню">
@@ -93,28 +100,40 @@
                         <h3 class="app-title">Watch Weather</h3>
                         <p class="app-tagline">Погода на вашем запястье</p>
                         <p class="app-description">
-                            Прогноз погоды для Apple Watch и iPhone с данными от Apple WeatherKit.
+                            Полнофункциональное приложение погоды, оптимизированное для Apple Watch и iPhone. 
+                            Использует Apple WeatherKit для точных прогнозов с почасовыми данными, 
+                            предупреждениями о погодных условиях и красивыми анимированными иконками. 
+                            Поддержка complications для циферблатов Apple Watch.
                         </p>
                         <div class="app-features">
-                            <span class="feature-tag">iOS</span>
-                            <span class="feature-tag">watchOS</span>
-                            <span class="feature-tag">WeatherKit</span>
-                            <span class="feature-tag">Анимации</span>
+                            <span class="feature-tag">iOS 17+</span>
+                            <span class="feature-tag">watchOS 10+</span>
+                            <span class="feature-tag">WeatherKit API</span>
+                            <span class="feature-tag">Complications</span>
+                            <span class="feature-tag">SwiftUI</span>
                         </div>
                         <div class="app-stats">
                             <div class="stat">
-                                <span class="stat-value">⌚</span>
-                                <span class="stat-label">Apple Watch</span>
+                                <span class="stat-value">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </span>
+                                <span class="stat-label">iPhone & Watch</span>
                             </div>
                             <div class="stat">
-                                <span class="stat-value">🎨</span>
-                                <span class="stat-label">анимации</span>
+                                <span class="stat-value">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" />
+                                    </svg>
+                                </span>
+                                <span class="stat-label">виджеты & complications</span>
                             </div>
                         </div>
                         <div class="app-links">
-                            <a href="#" class="app-store-badge" target="_blank" rel="noopener">
-                                <span>Скоро в App Store</span>
-                            </a>
+                            <div class="coming-soon-badge">
+                                <span>Скоро</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -129,28 +148,41 @@
                         <h3 class="app-title">Homie</h3>
                         <p class="app-tagline">Универсальное управление умным домом</p>
                         <p class="app-description">
-                            Управление умным домом через HomeKit на iOS, iPadOS и tvOS.
+                            Мощное приложение для управления умным домом через Apple HomeKit. 
+                            Поддерживает более 15 типов устройств: освещение, термостаты, замки, камеры, 
+                            датчики и многое другое. Создавайте сцены, автоматизации и управляйте домом 
+                            с iPhone, iPad и Apple TV. Полная поддержка Siri для голосового управления.
                         </p>
                         <div class="app-features">
-                            <span class="feature-tag">iOS</span>
-                            <span class="feature-tag">iPadOS</span>
-                            <span class="feature-tag">tvOS</span>
+                            <span class="feature-tag">iOS 17+</span>
+                            <span class="feature-tag">iPadOS 17+</span>
+                            <span class="feature-tag">tvOS 17+</span>
                             <span class="feature-tag">HomeKit</span>
+                            <span class="feature-tag">Siri</span>
+                            <span class="feature-tag">Виджеты</span>
                         </div>
                         <div class="app-stats">
                             <div class="stat">
-                                <span class="stat-value">15+</span>
-                                <span class="stat-label">типов устройств</span>
+                                <span class="stat-value">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                                    </svg>
+                                </span>
+                                <span class="stat-label">15+ типов устройств</span>
                             </div>
                             <div class="stat">
-                                <span class="stat-value">3</span>
-                                <span class="stat-label">платформы</span>
+                                <span class="stat-value">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 20.25h12m-7.5-3v3m3-3v3m-10.125-3h17.25c.621 0 1.125-.504 1.125-1.125V4.875c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125z" />
+                                    </svg>
+                                </span>
+                                <span class="stat-label">iPhone, iPad, TV</span>
                             </div>
                         </div>
                         <div class="app-links">
-                            <a href="#" class="app-store-badge" target="_blank" rel="noopener">
-                                <span>Скоро в App Store</span>
-                            </a>
+                            <div class="coming-soon-badge">
+                                <span>Скоро</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -165,27 +197,40 @@
                         <h3 class="app-title">Floralia</h3>
                         <p class="app-tagline">Забота о женском здоровье</p>
                         <p class="app-description">
-                            Отслеживание цикла с дневником и прогнозами. Данные хранятся локально или в iCloud.
+                            Приватное приложение для отслеживания менструального цикла с подробной аналитикой, 
+                            прогнозами и персональным дневником. Все данные хранятся локально на устройстве 
+                            или в защищенном iCloud. Интеграция с Apple Health для синхронизации данных. 
+                            Умные напоминания и графики для понимания вашего цикла.
                         </p>
                         <div class="app-features">
-                            <span class="feature-tag">iOS</span>
-                            <span class="feature-tag">Здоровье</span>
+                            <span class="feature-tag">iOS 17+</span>
+                            <span class="feature-tag">Apple Health</span>
+                            <span class="feature-tag">iCloud Sync</span>
                             <span class="feature-tag">Privacy First</span>
+                            <span class="feature-tag">Графики</span>
                         </div>
                         <div class="app-stats">
                             <div class="stat">
-                                <span class="stat-value">100%</span>
-                                <span class="stat-label">приватность</span>
+                                <span class="stat-value">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                                    </svg>
+                                </span>
+                                <span class="stat-label">100% локально</span>
                             </div>
                             <div class="stat">
-                                <span class="stat-value">📊</span>
-                                <span class="stat-label">аналитика</span>
+                                <span class="stat-value">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+                                    </svg>
+                                </span>
+                                <span class="stat-label">детальная аналитика</span>
                             </div>
                         </div>
                         <div class="app-links">
-                            <a href="#" class="app-store-badge" target="_blank" rel="noopener">
-                                <span>Скоро в App Store</span>
-                            </a>
+                            <div class="coming-soon-badge">
+                                <span>Скоро</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -200,27 +245,40 @@
                         <h3 class="app-title">CheckList</h3>
                         <p class="app-tagline">Умное управление задачами</p>
                         <p class="app-description">
-                            Создание и управление чек-листами с синхронизацией и уведомлениями.
+                            Мощный менеджер задач и чек-листов для повышения продуктивности. 
+                            Создавайте списки покупок, рабочие задачи и личные цели. 
+                            Автоматическая синхронизация через iCloud между всеми устройствами. 
+                            Умные уведомления, подзадачи, теги и быстрый доступ через виджеты.
                         </p>
                         <div class="app-features">
-                            <span class="feature-tag">iOS</span>
-                            <span class="feature-tag">Продуктивность</span>
-                            <span class="feature-tag">Синхронизация</span>
+                            <span class="feature-tag">iOS 17+</span>
+                            <span class="feature-tag">iCloud Sync</span>
+                            <span class="feature-tag">Уведомления</span>
+                            <span class="feature-tag">Виджеты</span>
+                            <span class="feature-tag">Live Activities</span>
                         </div>
                         <div class="app-stats">
                             <div class="stat">
-                                <span class="stat-value">☁️</span>
-                                <span class="stat-label">облако</span>
+                                <span class="stat-value">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z" />
+                                    </svg>
+                                </span>
+                                <span class="stat-label">синхронизация iCloud</span>
                             </div>
                             <div class="stat">
-                                <span class="stat-value">🔔</span>
-                                <span class="stat-label">уведомления</span>
+                                <span class="stat-value">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+                                    </svg>
+                                </span>
+                                <span class="stat-label">умные напоминания</span>
                             </div>
                         </div>
                         <div class="app-links">
-                            <a href="#" class="app-store-badge" target="_blank" rel="noopener">
-                                <span>Скоро в App Store</span>
-                            </a>
+                            <div class="coming-soon-badge">
+                                <span>Скоро</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -240,21 +298,13 @@
 
             <div class="contact-cards">
                 <div class="contact-card">
-                    <div class="contact-icon">📧</div>
+                    <div class="contact-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                        </svg>
+                    </div>
                     <h3>Email</h3>
                     <a href="mailto:support@vsapps.ru">support@vsapps.ru</a>
-                </div>
-
-                <div class="contact-card">
-                    <div class="contact-icon">💼</div>
-                    <h3>GitHub</h3>
-                    <a href="https://github.com/zerikc" target="_blank" rel="noopener">github.com/zerikc</a>
-                </div>
-
-                <div class="contact-card">
-                    <div class="contact-icon">🌐</div>
-                    <h3>Локация</h3>
-                    <p>Россия</p>
                 </div>
             </div>
         </div>
@@ -302,7 +352,6 @@
 
             <div class="footer-bottom">
                 <p>&copy; 2025 Владислав Сидельников. Все права защищены.</p>
-                <p class="footer-note">Сделано с ❤️ для iOS сообщества</p>
             </div>
         </div>
     </footer>
