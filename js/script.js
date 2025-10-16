@@ -413,6 +413,38 @@
     window.addEventListener('scroll', debounce(updateScrollProgress));
     
     // ================================
+    // Scroll Chevron
+    // ================================
+    
+    const scrollChevron = document.querySelector('.scroll-chevron');
+    
+    if (scrollChevron) {
+        // Hide chevron on scroll
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            if (scrolled > 300) {
+                scrollChevron.classList.add('hidden');
+            } else {
+                scrollChevron.classList.remove('hidden');
+            }
+        });
+        
+        // Scroll to apps section on click
+        scrollChevron.addEventListener('click', () => {
+            const appsSection = document.getElementById('apps');
+            if (appsSection) {
+                const navbarHeight = document.getElementById('navbar').offsetHeight;
+                const targetPosition = appsSection.getBoundingClientRect().top + window.pageYOffset - navbarHeight;
+                
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    }
+    
+    // ================================
     // Section Dots Navigation
     // ================================
     
