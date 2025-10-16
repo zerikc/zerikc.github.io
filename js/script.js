@@ -404,7 +404,7 @@
     
     console.log('%c👋 Привет, любопытный разработчик!', 'font-size: 20px; font-weight: bold; color: #007AFF;');
     console.log('%cЕсли ты ищешь талантливого iOS разработчика, напиши мне!', 'font-size: 14px; color: #98989D;');
-    console.log('%c📧 support@vsapps.ru', 'font-size: 14px; color: #5856D6;');
+    console.log('%c📧 zerikc@icloud.com', 'font-size: 14px; color: #5856D6;');
     
     // ================================
     // Utility: Copy Email on Click
