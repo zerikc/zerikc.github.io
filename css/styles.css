@@ -1056,33 +1056,20 @@ section {
     filter: brightness(1.1);
 }
 
-/* Показываем темный бейдж по умолчанию (темная тема) */
-.app-store-badge-dark {
-    display: block;
-}
-
+/* По умолчанию скрываем оба бейджа */
+.app-store-badge-dark,
 .app-store-badge-light {
     display: none;
 }
 
+/* Показываем темный бейдж в темной теме (по умолчанию) */
+html:not([data-theme="light"]) .app-store-badge-dark {
+    display: block;
+}
+
 /* Показываем светлый бейдж в светлой теме */
-html[data-theme="light"] .app-store-badge-dark {
-    display: none !important;
-}
-
 html[data-theme="light"] .app-store-badge-light {
-    display: block !important;
-}
-
-/* Поддержка prefers-color-scheme только если нет data-theme */
-@media (prefers-color-scheme: light) {
-    html:not([data-theme]) .app-store-badge-dark {
-        display: none;
-    }
-    
-    html:not([data-theme]) .app-store-badge-light {
-        display: block;
-    }
+    display: block;
 }
 
 /* Мобильная адаптация для кнопки App Store */
