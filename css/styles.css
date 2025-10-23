@@ -1022,34 +1022,26 @@ section {
     cursor: default;
 }
 
-.app-store-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    background: linear-gradient(135deg, #007AFF, #5856D6);
-    border: none;
-    border-radius: var(--radius-md);
-    color: white;
-    font-weight: 600;
-    font-size: var(--font-size-sm);
-    text-decoration: none;
+.app-store-badge {
+    display: inline-block;
     transition: all var(--transition-normal);
-    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
 }
 
-.app-store-link:hover {
+.app-store-badge:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 122, 255, 0.4);
-    color: white;
-    text-decoration: none;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
-.app-store-link svg {
-    width: 18px;
-    height: 18px;
-    fill: currentColor;
+.app-store-badge img {
+    display: block;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-normal);
+}
+
+.app-store-badge:hover img {
+    filter: brightness(1.1);
 }
 
 /* ================================
