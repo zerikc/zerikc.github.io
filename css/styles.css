@@ -1059,18 +1059,18 @@ section {
 /* По умолчанию скрываем оба бейджа */
 .app-store-badge-dark,
 .app-store-badge-light {
-    display: none;
+    display: none !important;
 }
 
 /* Показываем темный бейдж в темной теме или когда нет data-theme */
 html[data-theme="dark"] .app-store-badge-dark,
 html:not([data-theme]) .app-store-badge-dark {
-    display: block;
+    display: block !important;
 }
 
 /* Показываем светлый бейдж только в светлой теме */
 html[data-theme="light"] .app-store-badge-light {
-    display: block;
+    display: block !important;
 }
 
 /* Мобильная адаптация для кнопки App Store */
