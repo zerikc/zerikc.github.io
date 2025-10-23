@@ -1056,7 +1056,7 @@ section {
     filter: brightness(1.1);
 }
 
-/* Показываем темный бейдж по умолчанию */
+/* Показываем темный бейдж по умолчанию (темная тема) */
 .app-store-badge-dark {
     display: block;
 }
@@ -1066,21 +1066,21 @@ section {
 }
 
 /* Показываем светлый бейдж в светлой теме */
-[data-theme="light"] .app-store-badge-dark {
-    display: none;
+html[data-theme="light"] .app-store-badge-dark {
+    display: none !important;
 }
 
-[data-theme="light"] .app-store-badge-light {
-    display: block;
+html[data-theme="light"] .app-store-badge-light {
+    display: block !important;
 }
 
-/* Поддержка prefers-color-scheme */
+/* Поддержка prefers-color-scheme только если нет data-theme */
 @media (prefers-color-scheme: light) {
-    .app-store-badge-dark {
+    html:not([data-theme]) .app-store-badge-dark {
         display: none;
     }
     
-    .app-store-badge-light {
+    html:not([data-theme]) .app-store-badge-light {
         display: block;
     }
 }
