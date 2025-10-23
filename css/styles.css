@@ -1062,12 +1062,13 @@ section {
     display: none;
 }
 
-/* Показываем темный бейдж в темной теме (по умолчанию) */
-html:not([data-theme="light"]) .app-store-badge-dark {
+/* Показываем темный бейдж в темной теме или когда нет data-theme */
+html[data-theme="dark"] .app-store-badge-dark,
+html:not([data-theme]) .app-store-badge-dark {
     display: block;
 }
 
-/* Показываем светлый бейдж в светлой теме */
+/* Показываем светлый бейдж только в светлой теме */
 html[data-theme="light"] .app-store-badge-light {
     display: block;
 }
