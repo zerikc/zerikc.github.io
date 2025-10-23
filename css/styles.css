@@ -1044,6 +1044,35 @@ section {
     filter: brightness(1.1);
 }
 
+/* Показываем темный бейдж по умолчанию */
+.app-store-badge-dark {
+    display: block;
+}
+
+.app-store-badge-light {
+    display: none;
+}
+
+/* Показываем светлый бейдж в светлой теме */
+[data-theme="light"] .app-store-badge-dark {
+    display: none;
+}
+
+[data-theme="light"] .app-store-badge-light {
+    display: block;
+}
+
+/* Поддержка prefers-color-scheme */
+@media (prefers-color-scheme: light) {
+    .app-store-badge-dark {
+        display: none;
+    }
+    
+    .app-store-badge-light {
+        display: block;
+    }
+}
+
 /* ================================
    Contact Section
    ================================ */
