@@ -6,6 +6,92 @@
     'use strict';
 
     // ================================
+    // App Detail Toggle System - MUST be declared first
+    // ================================
+    
+    let currentActiveApp = null;
+    
+    // Global function for showing app details
+    window.showAppDetail = function(appId) {
+        // Remove active class from all mini cards
+        document.querySelectorAll('.app-mini-card').forEach(card => {
+            card.classList.remove('active');
+        });
+        
+        // Hide all detail cards
+        document.querySelectorAll('.app-detail-card').forEach(card => {
+            card.classList.remove('active');
+        });
+        
+        // If clicking the same app, close it
+        if (currentActiveApp === appId) {
+            currentActiveApp = null;
+            return;
+        }
+        
+        // Show selected app
+        const miniCard = document.querySelector(`[data-app="${appId}"]`);
+        const detailCard = document.getElementById(`detail-${appId}`);
+        
+        if (miniCard && detailCard) {
+            miniCard.classList.add('active');
+            detailCard.classList.add('active');
+            currentActiveApp = appId;
+            
+            // Smooth scroll to detail section
+            const detailSection = document.querySelector('.app-detail-section');
+            if (detailSection) {
+                const navbarHeight = document.getElementById('navbar').offsetHeight;
+                const targetPosition = detailSection.getBoundingClientRect().top + window.pageYOffset - navbarHeight - 20;
+                
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        }
+    };
+    
+    // Initialize app detail system
+    function initAppDetailSystem() {
+        const miniCards = document.querySelectorAll('.app-mini-card');
+        
+        if (miniCards.length === 0) {
+            return;
+        }
+        
+        // Handle clicks on mini cards
+        miniCards.forEach((card) => {
+            const appId = card.getAttribute('data-app');
+            
+            card.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (appId) {
+                    showAppDetail(appId);
+                }
+            });
+        });
+        
+        const expandArrows = document.querySelectorAll('.expand-arrow');
+        
+        // Handle clicks on expand arrows specifically
+        expandArrows.forEach((arrow) => {
+            arrow.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const miniCard = arrow.closest('.app-mini-card');
+                if (miniCard) {
+                    const appId = miniCard.getAttribute('data-app');
+                    if (appId) {
+                        showAppDetail(appId);
+                    }
+                }
+            });
+        });
+    }
+
+    // ================================
     // PWA - Service Worker Registration
     // ================================
     
@@ -686,7 +772,9 @@
         }, 100);
         
         // Initialize app detail system
-        initAppDetailSystem();
+        setTimeout(() => {
+            initAppDetailSystem();
+        }, 500);
         
         // Trigger initial animations
         highlightNavigation();
@@ -741,105 +829,6 @@
             }
         });
     });
-    
-    // ================================
-    // App Detail Toggle System
-    // ================================
-    
-    let currentActiveApp = null;
-    
-    // Global function for showing app details
-    window.showAppDetail = function(appId) {
-        console.log('=== showAppDetail START ===', appId);
-        
-        // Remove active class from all mini cards
-        document.querySelectorAll('.app-mini-card').forEach(card => {
-            card.classList.remove('active');
-        });
-        
-        // Hide all detail cards
-        document.querySelectorAll('.app-detail-card').forEach(card => {
-            card.classList.remove('active');
-        });
-        
-        // If clicking the same app, close it
-        if (currentActiveApp === appId) {
-            console.log('Closing same app');
-            currentActiveApp = null;
-            return;
-        }
-        
-        // Show selected app
-        const miniCard = document.querySelector(`[data-app="${appId}"]`);
-        const detailCard = document.getElementById(`detail-${appId}`);
-        
-        console.log('Elements found - miniCard:', !!miniCard, 'detailCard:', !!detailCard);
-        
-        if (miniCard && detailCard) {
-            miniCard.classList.add('active');
-            detailCard.classList.add('active');
-            currentActiveApp = appId;
-            
-            console.log('Successfully showing detail for:', appId);
-            
-            // Smooth scroll to detail section
-            const detailSection = document.querySelector('.app-detail-section');
-            if (detailSection) {
-                const navbarHeight = document.getElementById('navbar').offsetHeight;
-                const targetPosition = detailSection.getBoundingClientRect().top + window.pageYOffset - navbarHeight - 20;
-                
-                window.scrollTo({
-                    top: targetPosition,
-                    behavior: 'smooth'
-                });
-            }
-        } else {
-            console.error('ERROR: Could not find elements for app:', appId);
-        }
-        console.log('=== showAppDetail END ===');
-    };
-    
-    // Initialize app detail system
-    function initAppDetailSystem() {
-        console.log('Init app detail system...'); // Debug
-        
-        const miniCards = document.querySelectorAll('.app-mini-card');
-        console.log('Found mini cards:', miniCards.length); // Debug
-        
-        // Handle clicks on mini cards
-        miniCards.forEach(card => {
-            card.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const appId = card.getAttribute('data-app');
-                console.log('Mini card clicked:', appId); // Debug
-                showAppDetail(appId);
-            });
-        });
-        
-        const expandArrows = document.querySelectorAll('.expand-arrow');
-        console.log('Found expand arrows:', expandArrows.length); // Debug
-        
-        // Handle clicks on expand arrows specifically
-        expandArrows.forEach(arrow => {
-            arrow.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const miniCard = arrow.closest('.app-mini-card');
-                if (miniCard) {
-                    const appId = miniCard.getAttribute('data-app');
-                    console.log('Arrow clicked:', appId); // Debug
-                    showAppDetail(appId);
-                }
-            });
-        });
-        
-        // Auto-show first app detail on load
-        setTimeout(() => {
-            console.log('Auto-showing first app...'); // Debug
-            showAppDetail('weather');
-        }, 1000);
-    }
     
     // Add slideUp animation
     const style = document.createElement('style');
