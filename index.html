@@ -126,22 +126,110 @@
             </div>
 
             <div class="apps-grid">
-                <!-- Watch Weather App -->
-                <div class="app-card" data-app="weather">
-                    <div class="app-icon">
-                        <img src="images/weather-icon.png" alt="Watch Weather" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
-                        <div class="app-icon-fallback" style="display: none;">⛅</div>
+                <!-- Mini Cards Grid -->
+                <div class="apps-mini-grid">
+                    <!-- Watch Weather Mini Card -->
+                    <div class="app-mini-card" data-app="weather">
+                        <div class="app-mini-icon">
+                            <img src="images/weather-icon.png" alt="Watch Weather" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                            <div class="app-icon-fallback" style="display: none;">⛅</div>
+                        </div>
+                        <h3 class="app-mini-title">Watch Weather</h3>
+                        <p class="app-mini-tagline">Погода на вашем запястье</p>
+                        <div class="app-mini-status">Скоро</div>
+                        <div class="expand-arrow">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                            </svg>
+                        </div>
                     </div>
-                    <div class="app-content">
-                        <h3 class="app-title">Watch Weather</h3>
-                        <p class="app-tagline">Погода на вашем запястье</p>
-                        <p class="app-description">
+
+                    <!-- Homie Mini Card -->
+                    <div class="app-mini-card" data-app="homie">
+                        <div class="app-mini-icon">
+                            <img src="images/homie-icon.png" alt="Homie" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                            <div class="app-icon-fallback" style="display: none;">🏠</div>
+                        </div>
+                        <h3 class="app-mini-title">Homie</h3>
+                        <p class="app-mini-tagline">Управление умным домом</p>
+                        <div class="app-mini-status">Скоро</div>
+                        <div class="expand-arrow">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Floralia Mini Card -->
+                    <div class="app-mini-card" data-app="floralia">
+                        <div class="app-mini-icon">
+                            <img src="images/floralia-icon.png" alt="Floralia" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                            <div class="app-icon-fallback" style="display: none;">🌸</div>
+                        </div>
+                        <h3 class="app-mini-title">Floralia</h3>
+                        <p class="app-mini-tagline">Женский календарь здоровья</p>
+                        <div class="app-mini-status">В App Store</div>
+                        <div class="expand-arrow">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- CheckList Mini Card -->
+                    <div class="app-mini-card" data-app="checklist">
+                        <div class="app-mini-icon">
+                            <img src="images/checklist-icon.png" alt="CheckList" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                            <div class="app-icon-fallback" style="display: none;">✓</div>
+                        </div>
+                        <h3 class="app-mini-title">CheckList</h3>
+                        <p class="app-mini-tagline">Управление сменами с AI</p>
+                        <div class="app-mini-status">Скоро</div>
+                        <div class="expand-arrow">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Shattered Realm Mini Card -->
+                    <div class="app-mini-card" data-app="shattered-realm">
+                        <div class="app-mini-icon">
+                            <img src="images/shattered-realm-icon.png" alt="Shattered Realm" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                            <div class="app-icon-fallback" style="display: none;">⚔️</div>
+                        </div>
+                        <h3 class="app-mini-title">Shattered Realm</h3>
+                        <p class="app-mini-tagline">Low-Poly 3D RPG</p>
+                        <div class="app-mini-status">В разработке</div>
+                        <div class="expand-arrow">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- App Detail Section -->
+                <div class="app-detail-section">
+                    <!-- Watch Weather Detail -->
+                    <div class="app-detail-card" id="detail-weather">
+                        <div class="app-detail-header">
+                            <div class="app-detail-icon">
+                                <img src="images/weather-icon.png" alt="Watch Weather" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                                <div class="app-icon-fallback" style="display: none;">⛅</div>
+                            </div>
+                            <div class="app-detail-info">
+                                <h3>Watch Weather</h3>
+                                <p class="app-tagline">Погода на вашем запястье</p>
+                            </div>
+                        </div>
+                        <p class="app-detail-description">
                             Универсальное приложение погоды для всех устройств Apple: iPhone, iPad, Apple Watch, Apple TV и Mac. 
                             Использует Apple WeatherKit для точных прогнозов с почасовыми данными, 
                             предупреждениями о погодных условиях и красивыми анимированными иконками. 
                             Поддержка complications для циферблатов Apple Watch и виджетов для всех платформ.
                         </p>
-                        <div class="app-features">
+                        <div class="app-detail-features">
                             <span class="feature-tag">iOS 18.6+</span>
                             <span class="feature-tag">watchOS 10.6+</span>
                             <span class="feature-tag">tvOS 18.6+</span>
@@ -150,7 +238,7 @@
                             <span class="feature-tag">Complications</span>
                             <span class="feature-tag">SwiftUI</span>
                         </div>
-                        <div class="app-stats">
+                        <div class="app-detail-stats">
                             <div class="stat">
                                 <span class="stat-value">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -168,30 +256,32 @@
                                 <span class="stat-label">виджеты & complications</span>
                             </div>
                         </div>
-                        <div class="app-links">
+                        <div class="app-detail-links">
                             <div class="coming-soon-badge">
                                 <span>Скоро</span>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Homie App -->
-                <div class="app-card" data-app="homie">
-                    <div class="app-icon">
-                        <img src="images/homie-icon.png" alt="Homie" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
-                        <div class="app-icon-fallback" style="display: none;">🏠</div>
-                    </div>
-                    <div class="app-content">
-                        <h3 class="app-title">Homie</h3>
-                        <p class="app-tagline">Универсальное управление умным домом</p>
-                        <p class="app-description">
+                    <!-- Homie Detail -->
+                    <div class="app-detail-card" id="detail-homie">
+                        <div class="app-detail-header">
+                            <div class="app-detail-icon">
+                                <img src="images/homie-icon.png" alt="Homie" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                                <div class="app-icon-fallback" style="display: none;">🏠</div>
+                            </div>
+                            <div class="app-detail-info">
+                                <h3>Homie</h3>
+                                <p class="app-tagline">Универсальное управление умным домом</p>
+                            </div>
+                        </div>
+                        <p class="app-detail-description">
                             Мощное приложение для управления умным домом через Apple HomeKit. 
                             Поддерживает более 15 типов устройств: освещение, термостаты, замки, камеры, 
                             датчики и многое другое. Создавайте сцены, автоматизации и управляйте домом 
                             с iPhone, iPad и Apple TV. Полная поддержка Siri для голосового управления.
                         </p>
-                        <div class="app-features">
+                        <div class="app-detail-features">
                             <span class="feature-tag">iOS 17+</span>
                             <span class="feature-tag">iPadOS 17+</span>
                             <span class="feature-tag">tvOS 17+</span>
@@ -199,7 +289,7 @@
                             <span class="feature-tag">Siri</span>
                             <span class="feature-tag">Виджеты</span>
                         </div>
-                        <div class="app-stats">
+                        <div class="app-detail-stats">
                             <div class="stat">
                                 <span class="stat-value">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -217,30 +307,32 @@
                                 <span class="stat-label">iPhone, iPad, TV</span>
                             </div>
                         </div>
-                        <div class="app-links">
+                        <div class="app-detail-links">
                             <div class="coming-soon-badge">
                                 <span>Скоро</span>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Floralia App -->
-                <div class="app-card" data-app="floralia">
-                    <div class="app-icon">
-                        <img src="images/floralia-icon.png" alt="Floralia" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
-                        <div class="app-icon-fallback" style="display: none;">🌸</div>
-                    </div>
-                    <div class="app-content">
-                        <h3 class="app-title">Floralia</h3>
-                        <p class="app-tagline">Женский календарь здоровья и благополучия</p>
-                        <p class="app-description">
+                    <!-- Floralia Detail -->
+                    <div class="app-detail-card" id="detail-floralia">
+                        <div class="app-detail-header">
+                            <div class="app-detail-icon">
+                                <img src="images/floralia-icon.png" alt="Floralia" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                                <div class="app-icon-fallback" style="display: none;">🌸</div>
+                            </div>
+                            <div class="app-detail-info">
+                                <h3>Floralia</h3>
+                                <p class="app-tagline">Женский календарь здоровья и благополучия</p>
+                            </div>
+                        </div>
+                        <p class="app-detail-description">
                             Современное iOS приложение для отслеживания менструального цикла, настроения и здоровья. 
                             Медицински точный прогноз с историей фаз, 12 настроений, 33 симптома, интимная жизнь, либидо, контрацепция. 
                             PDF-экспорт для врача, iCloud синхронизация, PIN/биометрия защита, темная тема. 
                             Персонализация по возрасту, модуль планирования беременности с календарем оптимальных дней.
                         </p>
-                        <div class="app-features">
+                        <div class="app-detail-features">
                             <span class="feature-tag">iOS 26+</span>
                             <span class="feature-tag">iPadOS 26+</span>
                             <span class="feature-tag">SwiftUI</span>
@@ -249,7 +341,7 @@
                             <span class="feature-tag">PDF Export</span>
                             <span class="feature-tag">Planning Module</span>
                         </div>
-                        <div class="app-stats">
+                        <div class="app-detail-stats">
                             <div class="stat">
                                 <span class="stat-value">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -267,31 +359,33 @@
                                 <span class="stat-label">Статистика</span>
                             </div>
                         </div>
-                        <div class="app-links">
+                        <div class="app-detail-links">
                             <a href="https://apps.apple.com/app/floralia/id6753785306" target="_blank" rel="noopener noreferrer" class="app-store-badge">
                                 <img src="images/app-store-badge-dark.svg" alt="Скачать в App Store" class="app-store-badge-dark">
                                 <img src="images/app-store-badge-light.svg" alt="Скачать в App Store" class="app-store-badge-light">
                             </a>
                         </div>
                     </div>
-                </div>
 
-                <!-- CheckList App -->
-                <div class="app-card" data-app="checklist">
-                    <div class="app-icon">
-                        <img src="images/checklist-icon.png" alt="CheckList" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
-                        <div class="app-icon-fallback" style="display: none;">✓</div>
-                    </div>
-                    <div class="app-content">
-                        <h3 class="app-title">CheckList</h3>
-                        <p class="app-tagline">Управление сменами и командой с AI</p>
-                        <p class="app-description">
+                    <!-- CheckList Detail -->
+                    <div class="app-detail-card" id="detail-checklist">
+                        <div class="app-detail-header">
+                            <div class="app-detail-icon">
+                                <img src="images/checklist-icon.png" alt="CheckList" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                                <div class="app-icon-fallback" style="display: none;">✓</div>
+                            </div>
+                            <div class="app-detail-info">
+                                <h3>CheckList</h3>
+                                <p class="app-tagline">Управление сменами и командой с AI</p>
+                            </div>
+                        </div>
+                        <p class="app-detail-description">
                             Приложение для управления рабочими сменами, чек-листами и коммуникацией команды. 
                             Real-time синхронизация задач через Firebase Firestore, персональный AI-ассистент на базе DeepSeek с Markdown форматированием. 
                             Командный чат с push-уведомлениями, история смен с экспортом в PDF, контакты, заметки. 
                             Offline-first архитектура с кэшированием до 100 MB и экономией 95% Firestore reads.
                         </p>
-                        <div class="app-features">
+                        <div class="app-detail-features">
                             <span class="feature-tag">iOS 15+</span>
                             <span class="feature-tag">🤖 AI Assistant</span>
                             <span class="feature-tag">Firebase Firestore</span>
@@ -299,7 +393,7 @@
                             <span class="feature-tag">Push Notifications</span>
                             <span class="feature-tag">SwiftUI + MVVM</span>
                         </div>
-                        <div class="app-stats">
+                        <div class="app-detail-stats">
                             <div class="stat">
                                 <span class="stat-value">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -317,9 +411,59 @@
                                 <span class="stat-label">95% экономия Firestore</span>
                             </div>
                         </div>
-                        <div class="app-links">
+                        <div class="app-detail-links">
                             <div class="coming-soon-badge">
                                 <span>Скоро</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shattered Realm Detail -->
+                    <div class="app-detail-card" id="detail-shattered-realm">
+                        <div class="app-detail-header">
+                            <div class="app-detail-icon">
+                                <img src="images/shattered-realm-icon.png" alt="Shattered Realm" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                                <div class="app-icon-fallback" style="display: none;">⚔️</div>
+                            </div>
+                            <div class="app-detail-info">
+                                <h3>Shattered Realm</h3>
+                                <p class="app-tagline">Low-Poly 3D RPG для iOS</p>
+                            </div>
+                        </div>
+                        <p class="app-detail-description">
+                            3D RPG игра в стиле low-poly, разработанная для iOS с использованием SceneKit. 
+                            Игра повествует о разрушенном мире, состоящем из островов-биомов, по которым путешествует игрок в поисках равновесия. 
+                            Third-person камера, виртуальное управление с джойстиком, физический движок и система прогрессии.
+                        </p>
+                        <div class="app-detail-features">
+                            <span class="feature-tag">iOS 15+</span>
+                            <span class="feature-tag">SceneKit</span>
+                            <span class="feature-tag">3D Graphics</span>
+                            <span class="feature-tag">Low-Poly</span>
+                            <span class="feature-tag">RPG</span>
+                            <span class="feature-tag">Swift</span>
+                        </div>
+                        <div class="app-detail-stats">
+                            <div class="stat">
+                                <span class="stat-value">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+                                    </svg>
+                                </span>
+                                <span class="stat-label">3D Low-Poly</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A7.5 7.5 0 0118 12H6a7.5 7.5 0 00-1.499 8.118z" />
+                                    </svg>
+                                </span>
+                                <span class="stat-label">Third-person</span>
+                            </div>
+                        </div>
+                        <div class="app-detail-links">
+                            <div class="coming-soon-badge">
+                                <span>В разработке</span>
                             </div>
                         </div>
                     </div>
@@ -368,6 +512,7 @@
                         <li><a href="#apps">Homie</a></li>
                         <li><a href="#apps">Floralia</a></li>
                         <li><a href="#apps">CheckList</a></li>
+                        <li><a href="#apps">Shattered Realm</a></li>
                     </ul>
                 </div>
 
