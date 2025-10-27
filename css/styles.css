@@ -787,6 +787,10 @@ section {
     overflow: hidden;
 }
 
+.app-detail-section.hidden {
+    display: none;
+}
+
 .app-detail-card {
     background: rgba(28, 28, 30, 0.9);
     backdrop-filter: blur(20px);

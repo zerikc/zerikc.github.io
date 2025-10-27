@@ -13,6 +13,8 @@
     
     // Global function for showing app details
     window.showAppDetail = function(appId) {
+        const detailSection = document.querySelector('.app-detail-section');
+        
         // Remove active class from all mini cards
         document.querySelectorAll('.app-mini-card').forEach(card => {
             card.classList.remove('active');
@@ -26,6 +28,10 @@
         // If clicking the same app, close it
         if (currentActiveApp === appId) {
             currentActiveApp = null;
+            // Hide the detail section if no app is selected
+            if (detailSection) {
+                detailSection.classList.add('hidden');
+            }
             return;
         }
         
@@ -38,16 +44,20 @@
             detailCard.classList.add('active');
             currentActiveApp = appId;
             
-            // Smooth scroll to detail section
-            const detailSection = document.querySelector('.app-detail-section');
+            // Show the detail section
             if (detailSection) {
-                const navbarHeight = document.getElementById('navbar').offsetHeight;
-                const targetPosition = detailSection.getBoundingClientRect().top + window.pageYOffset - navbarHeight - 20;
+                detailSection.classList.remove('hidden');
                 
-                window.scrollTo({
-                    top: targetPosition,
-                    behavior: 'smooth'
-                });
+                // Smooth scroll to detail section
+                setTimeout(() => {
+                    const navbarHeight = document.getElementById('navbar').offsetHeight;
+                    const targetPosition = detailSection.getBoundingClientRect().top + window.pageYOffset - navbarHeight - 20;
+                    
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }, 100);
             }
         }
     };
@@ -55,6 +65,12 @@
     // Initialize app detail system
     function initAppDetailSystem() {
         const miniCards = document.querySelectorAll('.app-mini-card');
+        const detailSection = document.querySelector('.app-detail-section');
+        
+        // Hide detail section by default if no app is selected
+        if (detailSection && currentActiveApp === null) {
+            detailSection.classList.add('hidden');
+        }
         
         if (miniCards.length === 0) {
             return;
