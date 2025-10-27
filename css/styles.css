@@ -904,9 +904,29 @@ section {
     transform: translateY(-4px);
 }
 
+[data-theme="light"] .app-mini-card.active {
+    background: rgba(0, 122, 255, 0.15);
+}
+
+@media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) .app-mini-card.active {
+        background: rgba(0, 122, 255, 0.15);
+    }
+}
+
 .app-mini-card:hover {
     transform: translateY(-2px);
     border-color: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="light"] .app-mini-card:hover {
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+@media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) .app-mini-card:hover {
+        border-color: rgba(0, 0, 0, 0.2);
+    }
 }
 
 .app-mini-icon {
@@ -955,6 +975,30 @@ section {
     color: var(--primary-color);
 }
 
+[data-theme="light"] .app-mini-status {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+@media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) .app-mini-status {
+        background: rgba(0, 0, 0, 0.05);
+        border-color: rgba(0, 0, 0, 0.1);
+    }
+}
+
+[data-theme="light"] .app-mini-card.active .app-mini-status {
+    background: rgba(0, 122, 255, 0.25);
+    border-color: rgba(0, 122, 255, 0.5);
+}
+
+@media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) .app-mini-card.active .app-mini-status {
+        background: rgba(0, 122, 255, 0.25);
+        border-color: rgba(0, 122, 255, 0.5);
+    }
+}
+
 .expand-arrow {
     width: 24px;
     height: 24px;
@@ -969,6 +1013,16 @@ section {
     cursor: pointer;
 }
 
+[data-theme="light"] .expand-arrow {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+@media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) .expand-arrow {
+        background: rgba(0, 0, 0, 0.05);
+    }
+}
+
 .expand-arrow svg {
     width: 16px;
     height: 16px;
@@ -979,6 +1033,16 @@ section {
 
 .app-mini-card:hover .expand-arrow {
     background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] .app-mini-card:hover .expand-arrow {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+@media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) .app-mini-card:hover .expand-arrow {
+        background: rgba(0, 0, 0, 0.1);
+    }
 }
 
 .app-mini-card.active .expand-arrow {
@@ -1012,6 +1076,30 @@ section {
 
 @media (prefers-color-scheme: light) {
     :root:not([data-theme="dark"]) .app-card {
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+}
+
+[data-theme="light"] .app-mini-card {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+@media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) .app-mini-card {
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+}
+
+[data-theme="light"] .app-detail-card {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+@media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) .app-detail-card {
         background: rgba(255, 255, 255, 0.9);
         border: 1px solid rgba(0, 0, 0, 0.1);
     }
@@ -1134,6 +1222,18 @@ section {
     font-weight: 500;
 }
 
+[data-theme="light"] .feature-tag {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+@media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) .feature-tag {
+        background: rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+}
+
 .app-card:hover .feature-tag {
     background: rgba(0, 122, 255, 0.1);
     border-color: rgba(0, 122, 255, 0.3);
@@ -1174,6 +1274,16 @@ section {
     padding: var(--spacing-sm);
     background: rgba(255, 255, 255, 0.03);
     border-radius: var(--radius-sm);
+}
+
+[data-theme="light"] .stat {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+@media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) .stat {
+        background: rgba(0, 0, 0, 0.03);
+    }
 }
 
 .stat-value {
@@ -1240,6 +1350,18 @@ section {
     font-weight: 600;
     font-size: var(--font-size-sm);
     cursor: default;
+}
+
+[data-theme="light"] .coming-soon-badge {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+@media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) .coming-soon-badge {
+        background: rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(0, 0, 0, 0.15);
+    }
 }
 
 .app-store-badge {
