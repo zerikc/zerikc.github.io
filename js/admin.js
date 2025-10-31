@@ -177,6 +177,31 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // ================================
+// Initialize Event Listeners
+// ================================
+
+function initializeEventListeners() {
+    // Refresh collections button
+    if (elements.refreshCollectionsBtn) {
+        // Remove existing listener if any
+        const newBtn = elements.refreshCollectionsBtn.cloneNode(true);
+        elements.refreshCollectionsBtn.parentNode.replaceChild(newBtn, elements.refreshCollectionsBtn);
+        elements.refreshCollectionsBtn = newBtn;
+        
+        elements.refreshCollectionsBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            console.log('Refresh button clicked');
+            showToast('Обновление коллекций...', 'info');
+            await loadAllCollections();
+            showToast('Коллекции обновлены', 'success');
+        });
+        console.log('Refresh button listener added');
+    } else {
+        console.error('refreshCollectionsBtn not found');
+    }
+}
+
+// ================================
 // Collections Management
 // ================================
 
@@ -246,7 +271,15 @@ async function getCollectionStats(collectionName) {
 
 // Get all collections stats
 async function loadAllCollections() {
-    if (state.collectionsLoading) return;
+    if (!elements.collectionsGrid) {
+        console.error('collectionsGrid not found');
+        return;
+    }
+    
+    if (state.collectionsLoading) {
+        console.log('Collections already loading');
+        return;
+    }
     
     state.collectionsLoading = true;
     elements.collectionsGrid.innerHTML = '';
@@ -256,6 +289,7 @@ async function loadAllCollections() {
     elements.collectionsGrid.appendChild(loadingCard);
     
     try {
+        console.log('Loading collections...');
         const collectionsPromises = KNOWN_COLLECTIONS.map(name => getCollectionStats(name));
         const collectionsResults = await Promise.allSettled(collectionsPromises);
         
@@ -279,6 +313,7 @@ async function loadAllCollections() {
             return a.name.localeCompare(b.name);
         });
         
+        console.log('Collections loaded:', state.collections.length);
         renderCollections();
         
     } catch (error) {
@@ -408,11 +443,6 @@ function selectCollection(collectionName) {
         elements.collectionInfo.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
 }
-
-// Refresh collections
-elements.refreshCollectionsBtn.addEventListener('click', () => {
-    loadAllCollections();
-});
 
 // Load collection on Enter (manual input)
 elements.loadCollectionBtn.addEventListener('click', async () => {
@@ -785,6 +815,11 @@ function showLoginScreen() {
 function showAdminPanel() {
     elements.loginScreen.style.display = 'none';
     elements.adminPanel.style.display = 'block';
+    
+    // Initialize event listeners after panel is shown
+    setTimeout(() => {
+        initializeEventListeners();
+    }, 100);
 }
 
 function showLoading() {
