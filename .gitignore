@@ -36,3 +36,8 @@ node_modules/
 dist/
 build/
 
+# Admin panel (только локально)
+admin.html
+css/admin.css
+js/admin.js
+
