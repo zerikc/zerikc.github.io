@@ -41,3 +41,6 @@ admin.html
 css/admin.css
 js/admin.js
 
+# Firebase config (конфиденциальные данные)
+js/firebase-config.js
+
