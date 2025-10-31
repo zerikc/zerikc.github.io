@@ -38,7 +38,9 @@ const state = {
     pageSize: 20,
     searchTerm: '',
     searchField: null,
-    editingDocId: null
+    editingDocId: null,
+    collections: [],
+    collectionsLoading: false
 };
 
 const auth = window.firebaseAuth;
@@ -64,6 +66,10 @@ const elements = {
     adminPanel: getElement('adminPanel'),
     userEmail: getElement('userEmail'),
     logoutBtn: getElement('logoutBtn'),
+    
+    // Collections
+    collectionsGrid: getElement('collectionsGrid'),
+    refreshCollectionsBtn: getElement('refreshCollectionsBtn'),
     
     // Collection
     collectionInput: getElement('collectionInput'),
@@ -161,15 +167,254 @@ onAuthStateChanged(auth, (user) => {
     if (user) {
         elements.userEmail.textContent = user.email || user.displayName || 'Пользователь';
         showAdminPanel();
+        // Load collections after authentication
+        setTimeout(() => {
+            loadAllCollections();
+        }, 500);
     } else {
         showLoginScreen();
     }
 });
 
 // ================================
-// Collection Management
+// Collections Management
 // ================================
 
+// Known collections from Firestore rules
+const KNOWN_COLLECTIONS = [
+    'allowed_users',
+    'checklist',
+    'checklist_new',
+    'checklist_history',
+    'contacts',
+    'information_systems',
+    'notes',
+    'night_duty_schedule',
+    'shift_reports',
+    'custom_tasks',
+    'chat_sessions',
+    'ai_chat_sessions',
+    'chat_messages',
+    'conversations',
+    'chat_settings',
+    'chat_notifications',
+    'help_sections'
+];
+
+// Get collection stats
+async function getCollectionStats(collectionName) {
+    try {
+        const colRef = collection(db, collectionName);
+        const snapshot = await getDocs(query(colRef, limit(1)));
+        
+        // Get total count (approximate by checking if collection exists)
+        const totalSnapshot = await getDocs(query(colRef));
+        const totalCount = totalSnapshot.size;
+        
+        return {
+            name: collectionName,
+            count: totalCount,
+            exists: true,
+            error: null
+        };
+    } catch (error) {
+        // Check if error is permission denied vs collection doesn't exist
+        if (error.code === 'permission-denied') {
+            return {
+                name: collectionName,
+                count: 0,
+                exists: true, // Collection exists but no access
+                error: 'permission-denied'
+            };
+        } else if (error.code === 'not-found') {
+            return {
+                name: collectionName,
+                count: 0,
+                exists: false,
+                error: 'not-found'
+            };
+        } else {
+            return {
+                name: collectionName,
+                count: 0,
+                exists: false,
+                error: error.message
+            };
+        }
+    }
+}
+
+// Get all collections stats
+async function loadAllCollections() {
+    if (state.collectionsLoading) return;
+    
+    state.collectionsLoading = true;
+    elements.collectionsGrid.innerHTML = '';
+    
+    // Show loading state
+    const loadingCard = createCollectionCardLoading();
+    elements.collectionsGrid.appendChild(loadingCard);
+    
+    try {
+        const collectionsPromises = KNOWN_COLLECTIONS.map(name => getCollectionStats(name));
+        const collectionsResults = await Promise.allSettled(collectionsPromises);
+        
+        state.collections = collectionsResults.map((result, index) => {
+            if (result.status === 'fulfilled') {
+                return result.value;
+            } else {
+                return {
+                    name: KNOWN_COLLECTIONS[index],
+                    count: 0,
+                    exists: false,
+                    error: result.reason?.message || 'Unknown error'
+                };
+            }
+        });
+        
+        // Sort: existing collections first, then by count, then alphabetically
+        state.collections.sort((a, b) => {
+            if (a.exists !== b.exists) return b.exists - a.exists;
+            if (a.count !== b.count) return b.count - a.count;
+            return a.name.localeCompare(b.name);
+        });
+        
+        renderCollections();
+        
+    } catch (error) {
+        showToast('Ошибка загрузки коллекций: ' + getErrorMessage(error), 'error');
+        console.error('Error loading collections:', error);
+    } finally {
+        state.collectionsLoading = false;
+    }
+}
+
+// Create loading card
+function createCollectionCardLoading() {
+    const card = window.document.createElement('div');
+    card.className = 'collection-card';
+    card.innerHTML = `
+        <div class="collection-card-loading">
+            <div class="spinner" style="width: 20px; height: 20px; border-width: 2px;"></div>
+            <span>Загрузка коллекций...</span>
+        </div>
+    `;
+    return card;
+}
+
+// Render collections grid
+function renderCollections() {
+    elements.collectionsGrid.innerHTML = '';
+    
+    if (state.collections.length === 0) {
+        const emptyCard = window.document.createElement('div');
+        emptyCard.className = 'collection-card';
+        emptyCard.style.gridColumn = '1 / -1';
+        emptyCard.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Коллекции не найдены</p>';
+        elements.collectionsGrid.appendChild(emptyCard);
+        return;
+    }
+    
+    state.collections.forEach(collectionInfo => {
+        const card = createCollectionCard(collectionInfo);
+        elements.collectionsGrid.appendChild(card);
+    });
+}
+
+// Create collection card
+function createCollectionCard(collectionInfo) {
+    const card = window.document.createElement('div');
+    card.className = 'collection-card';
+    
+    const icon = getCollectionIcon(collectionInfo.name);
+    const statusColor = collectionInfo.exists ? 'var(--primary-color)' : 'var(--text-secondary)';
+    const statusText = collectionInfo.exists 
+        ? (collectionInfo.error === 'permission-denied' ? 'Нет доступа' : `${collectionInfo.count} документов`)
+        : 'Не найдена';
+    
+    card.innerHTML = `
+        <div class="collection-card-header">
+            <h3 class="collection-card-name">${collectionInfo.name}</h3>
+            <span class="collection-card-icon">${icon}</span>
+        </div>
+        <div class="collection-card-stats">
+            <div class="collection-card-stat">
+                <span>Статус:</span>
+                <span class="collection-card-stat-value" style="color: ${statusColor}">
+                    ${statusText}
+                </span>
+            </div>
+            ${collectionInfo.exists && !collectionInfo.error ? `
+                <div class="collection-card-stat">
+                    <span>Документов:</span>
+                    <span class="collection-card-stat-value">${collectionInfo.count}</span>
+                </div>
+            ` : ''}
+            ${collectionInfo.error && collectionInfo.error !== 'permission-denied' ? `
+                <div class="collection-card-error">Ошибка: ${collectionInfo.error}</div>
+            ` : ''}
+        </div>
+    `;
+    
+    if (collectionInfo.exists && collectionInfo.error !== 'permission-denied') {
+        card.addEventListener('click', () => {
+            selectCollection(collectionInfo.name);
+        });
+    } else {
+        card.style.opacity = '0.6';
+        card.style.cursor = 'not-allowed';
+    }
+    
+    return card;
+}
+
+// Get icon for collection
+function getCollectionIcon(collectionName) {
+    const icons = {
+        'allowed_users': '👥',
+        'checklist': '✅',
+        'checklist_new': '📝',
+        'checklist_history': '📜',
+        'contacts': '📇',
+        'information_systems': '💻',
+        'notes': '📄',
+        'night_duty_schedule': '🌙',
+        'shift_reports': '📊',
+        'custom_tasks': '🎯',
+        'chat_sessions': '💬',
+        'ai_chat_sessions': '🤖',
+        'chat_messages': '💭',
+        'conversations': '🗣️',
+        'chat_settings': '⚙️',
+        'chat_notifications': '🔔',
+        'help_sections': '❓'
+    };
+    return icons[collectionName] || '📦';
+}
+
+// Select collection
+function selectCollection(collectionName) {
+    state.currentCollection = collectionName;
+    state.currentPage = 1;
+    state.lastVisible = null;
+    state.searchTerm = '';
+    state.searchField = null;
+    
+    // Update input
+    elements.collectionInput.value = collectionName;
+    
+    // Scroll to documents section
+    loadCollection().then(() => {
+        elements.collectionInfo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+}
+
+// Refresh collections
+elements.refreshCollectionsBtn.addEventListener('click', () => {
+    loadAllCollections();
+});
+
+// Load collection on Enter (manual input)
 elements.loadCollectionBtn.addEventListener('click', async () => {
     const collectionName = elements.collectionInput.value.trim();
     
@@ -178,13 +423,7 @@ elements.loadCollectionBtn.addEventListener('click', async () => {
         return;
     }
     
-    state.currentCollection = collectionName;
-    state.currentPage = 1;
-    state.lastVisible = null;
-    state.searchTerm = '';
-    state.searchField = null;
-    
-    await loadCollection();
+    selectCollection(collectionName);
 });
 
 // Load collection on Enter
@@ -193,6 +432,8 @@ elements.collectionInput.addEventListener('keypress', (e) => {
         elements.loadCollectionBtn.click();
     }
 });
+
+// Auto-load collections function is already handled in onAuthStateChanged
 
 // ================================
 // Load Documents

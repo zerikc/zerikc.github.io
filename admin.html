@@ -55,10 +55,21 @@
         <!-- Main Content -->
         <main class="admin-main">
             <div class="admin-container">
-                <!-- Collection Selector -->
+                <!-- Collections List -->
                 <div class="admin-section">
+                    <div class="collections-header">
+                        <h2>Коллекции Firestore</h2>
+                        <button id="refreshCollectionsBtn" class="btn btn-secondary">🔄 Обновить</button>
+                    </div>
+                    <div id="collectionsGrid" class="collections-grid">
+                        <!-- Collections will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Collection Selector (Manual fallback) -->
+                <div class="admin-section" style="display: none;">
                     <div class="collection-selector">
-                        <label for="collectionInput">Коллекция:</label>
+                        <label for="collectionInput">Или введите название коллекции вручную:</label>
                         <input type="text" id="collectionInput" placeholder="Введите название коллекции" />
                         <button id="loadCollectionBtn" class="btn btn-primary">Загрузить</button>
                     </div>
