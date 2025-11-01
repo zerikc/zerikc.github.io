@@ -43,7 +43,8 @@ const state = {
     totalPages: 0,
     editingDocId: null,
     collections: [],
-    collectionsLoading: false
+    collectionsLoading: false,
+    isInitialLoad: true // Флаг первой загрузки - всегда показывать экран входа
 };
 
 // Get Firebase instances - with fallback check
@@ -201,6 +202,9 @@ async function handleGoogleSignIn() {
         state.currentUser = result.user;
         
         showToast('Вход выполнен успешно', 'success');
+        
+        // Снимаем флаг первой загрузки - пользователь явно вошел
+        state.isInitialLoad = false;
         
         // После успешной авторизации проверяем проекты
         checkProjectsAndShowScreen();
@@ -430,8 +434,14 @@ function setupAuthObserver() {
                 elements.userEmail.textContent = user.email || user.displayName || 'Пользователь';
             }
             
-            // Проверяем проекты и показываем нужный экран
-            checkProjectsAndShowScreen();
+            // При первой загрузке всегда показываем экран входа
+            // Только после явного клика на "Войти через Google" переходим к выбору проекта
+            if (state.isInitialLoad) {
+                showLoginScreen();
+            } else {
+                // Проверяем проекты и показываем нужный экран
+                checkProjectsAndShowScreen();
+            }
             
         } else {
             showLoginScreen();
