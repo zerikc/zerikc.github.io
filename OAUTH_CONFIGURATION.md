@@ -19,17 +19,25 @@ http://192.168.1.138
 ```
 
 ### 2. Authorized Redirect URIs
-Для Google Identity Services redirect не используется (popup), но если требуется:
+⚠️ **ВАЖНО**: Для Google Identity Services **ОБЯЗАТЕЛЬНО** нужно добавить все эти redirect URIs:
 
 ```
-https://zerikc.github.io
-https://zerikc.github.io/admin.html
 http://localhost
+http://localhost/
 http://localhost:3000
+http://localhost:3000/
 http://localhost:8080
-https://192.168.1.138
+http://localhost:8080/
+https://zerikc.github.io
+https://zerikc.github.io/
+https://zerikc.github.io/admin.html
 http://192.168.1.138
+http://192.168.1.138/
+https://192.168.1.138
+https://192.168.1.138/
 ```
+
+**Примечание**: Google Identity Services использует popup, но всё равно требует правильной настройки redirect URIs.
 
 ### 3. Scopes (области доступа)
 Убедитесь, что запрашиваемые области одобрены в OAuth Consent Screen:
