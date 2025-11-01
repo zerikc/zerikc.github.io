@@ -6,17 +6,18 @@
 ## Необходимые настройки в Google Cloud Console
 
 ### 1. Authorized JavaScript Origins
-Добавьте следующие origins для локальной разработки и продакшена:
+⚠️ **КРИТИЧЕСКИ ВАЖНО**: Добавьте следующие origins для локальной разработки и продакшена:
 
 ```
 http://localhost
 http://localhost:3000
 http://localhost:8080
 https://zerikc.github.io
-https://zerikc.github.io/
-https://192.168.1.138
 http://192.168.1.138
+https://192.168.1.138
 ```
+
+**Примечание**: В "JavaScript Origins" НЕ добавляйте завершающий слеш `/`!
 
 ### 2. Authorized Redirect URIs
 ⚠️ **ВАЖНО**: Для Google Identity Services **ОБЯЗАТЕЛЬНО** нужно добавить все эти redirect URIs:
