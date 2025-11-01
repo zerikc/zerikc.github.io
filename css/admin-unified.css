@@ -215,6 +215,68 @@ select:focus-visible,
     box-shadow: var(--focus-ring);
 }
 
+/* Theme Toggle */
+.theme-toggle {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--quaternary-fill);
+    border: 1px solid var(--separator);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    position: relative;
+    overflow: hidden;
+}
+
+.theme-toggle:hover {
+    background: var(--fill);
+    border-color: var(--separator);
+    transform: scale(1.05);
+}
+
+.theme-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--label);
+    transition: all var(--transition-normal);
+    position: absolute;
+}
+
+.sun-icon {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.5);
+}
+
+.moon-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+[data-theme="light"] .sun-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+[data-theme="light"] .moon-icon {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.5);
+}
+
+@media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) .sun-icon {
+        opacity: 1;
+        transform: rotate(0deg) scale(1);
+    }
+    
+    :root:not([data-theme="dark"]) .moon-icon {
+        opacity: 0;
+        transform: rotate(90deg) scale(0.5);
+    }
+}
+
 .toolbar-user {
     display: flex;
     align-items: center;
