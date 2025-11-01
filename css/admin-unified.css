@@ -1361,6 +1361,140 @@ select:focus-visible,
     overflow: hidden;
 }
 
+/* Login Toolbar */
+.login-toolbar {
+    position: fixed;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.login-toolbar-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 0.5px solid rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    cursor: pointer;
+    color: var(--text-primary);
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    padding: 0;
+}
+
+[data-theme="dark"] .login-toolbar-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .login-toolbar-btn {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.12);
+    }
+}
+
+[data-theme="light"] .login-toolbar-btn {
+    background: rgba(0, 0, 0, 0.06);
+    border-color: rgba(0, 0, 0, 0.12);
+}
+
+@media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) .login-toolbar-btn {
+        background: rgba(0, 0, 0, 0.06);
+        border-color: rgba(0, 0, 0, 0.12);
+    }
+}
+
+.login-toolbar-btn svg {
+    width: 20px;
+    height: 20px;
+    color: var(--text-primary);
+}
+
+.login-toolbar-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: scale(1.05);
+}
+
+[data-theme="light"] .login-toolbar-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+@media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) .login-toolbar-btn:hover {
+        background: rgba(0, 0, 0, 0.1);
+        border-color: rgba(0, 0, 0, 0.2);
+    }
+}
+
+.login-toolbar-btn:active {
+    transform: scale(0.95);
+}
+
+.login-toolbar-btn.theme-toggle {
+    position: relative;
+}
+
+.login-toolbar-btn .theme-icon {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    color: var(--text-primary);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.login-toolbar-btn .sun-icon {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.5);
+}
+
+.login-toolbar-btn .moon-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+[data-theme="light"] .login-toolbar-btn .sun-icon,
+:root:not([data-theme="dark"]) .login-toolbar-btn .sun-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+[data-theme="light"] .login-toolbar-btn .moon-icon,
+:root:not([data-theme="dark"]) .login-toolbar-btn .moon-icon {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.5);
+}
+
+@media (max-width: 768px) {
+    .login-toolbar {
+        top: var(--spacing-sm);
+        right: var(--spacing-sm);
+        gap: var(--spacing-xs);
+    }
+    
+    .login-toolbar-btn {
+        width: 44px;
+        height: 44px;
+    }
+    
+    .login-toolbar-btn svg,
+    .login-toolbar-btn .theme-icon {
+        width: 22px;
+        height: 22px;
+    }
+}
+
 .login-background {
     position: absolute;
     top: 0;
@@ -1453,10 +1587,33 @@ select:focus-visible,
 }
 
 .login-title {
-    font-size: clamp(2rem, 4vw, 3rem);
+    font-size: 2.5rem;
     font-weight: 700;
     margin-bottom: var(--spacing-md);
     text-align: center;
+    line-height: 1.2;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+}
+
+/* Адаптивные размеры для разных экранов */
+@media (max-width: 768px) {
+    .login-title {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-title {
+        font-size: 1.75rem;
+    }
+}
+
+@media (min-width: 1400px) {
+    .login-title {
+        font-size: 3rem;
+    }
 }
 
 .login-subtitle {

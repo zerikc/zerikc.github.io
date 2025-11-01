@@ -31,6 +31,22 @@
 <body>
     <!-- Login Screen -->
     <div id="loginScreen" class="login-screen">
+        <!-- Login Screen Toolbar -->
+        <div class="login-toolbar">
+            <a href="index.html" class="login-toolbar-btn" title="Вернуться на главную">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                </svg>
+            </a>
+            <button class="login-toolbar-btn theme-toggle" id="loginThemeToggle" aria-label="Переключить тему">
+                <svg class="theme-icon sun-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+                </svg>
+                <svg class="theme-icon moon-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+                </svg>
+            </button>
+        </div>
         <div class="login-background">
             <div class="gradient-orb orb-1"></div>
             <div class="gradient-orb orb-2"></div>
@@ -39,9 +55,7 @@
         <div class="login-container">
             <div class="login-card">
                 <div style="text-align: center; margin-bottom: 2rem;">
-                    <svg style="width: 64px; height: 64px; color: var(--apple-blue); margin-bottom: 1rem;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
-                    </svg>
+                    <img src="images/Logomark_Full%20Color.svg" alt="Firebase" style="width: 64px; height: 64px; margin-bottom: 1rem; display: inline-block;" />
                 </div>
                 <h1 class="login-title">Firebase Admin Panel</h1>
                 <p class="login-subtitle">Управление Firestore данными</p>
@@ -70,6 +84,22 @@
 
     <!-- Project Selection Screen -->
     <div id="projectSelectionScreen" class="login-screen" style="display: none;">
+        <!-- Project Selection Screen Toolbar -->
+        <div class="login-toolbar">
+            <a href="index.html" class="login-toolbar-btn" title="Вернуться на главную">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                </svg>
+            </a>
+            <button class="login-toolbar-btn theme-toggle" id="projectSelectionThemeToggle" aria-label="Переключить тему">
+                <svg class="theme-icon sun-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+                </svg>
+                <svg class="theme-icon moon-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+                </svg>
+            </button>
+        </div>
         <div class="login-background">
             <div class="gradient-orb orb-1"></div>
             <div class="gradient-orb orb-2"></div>
@@ -469,10 +499,20 @@
         function setupThemeToggle() {
             initTheme();
             
-            // Theme toggle button
+            // Theme toggle buttons (main panel and login screens)
             const themeToggle = document.getElementById('themeToggle');
             if (themeToggle) {
                 themeToggle.addEventListener('click', toggleTheme);
+            }
+            
+            const loginThemeToggle = document.getElementById('loginThemeToggle');
+            if (loginThemeToggle) {
+                loginThemeToggle.addEventListener('click', toggleTheme);
+            }
+            
+            const projectSelectionThemeToggle = document.getElementById('projectSelectionThemeToggle');
+            if (projectSelectionThemeToggle) {
+                projectSelectionThemeToggle.addEventListener('click', toggleTheme);
             }
         }
         
