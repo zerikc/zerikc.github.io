@@ -13,6 +13,9 @@
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json" />
     
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
     <!-- Apple Touch Icons -->
     <link rel="apple-touch-icon" sizes="180x180" href="images/icon-192.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="images/icon-96.png" />
@@ -414,42 +417,13 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp, deleteApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, connectFirestoreEmulator } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
         import { projectManager, ProjectManager } from './js/project-manager.js';
         
         let currentApp = null;
         
-        // Initialize Firebase with minimal config for Google Auth
-        async function initializeFirebaseAuth() {
-            try {
-                // Минимальная конфигурация для Google Auth
-                // Используем временный проект для авторизации
-                const authConfig = {
-                    apiKey: "AIzaSyChXxCJysVl3RCgbu1B0wxAa7gQQkkAkXk",
-                    authDomain: "check-list-c61c6.firebaseapp.com"
-                };
-                
-                currentApp = initializeApp(authConfig);
-                const auth = getAuth(currentApp);
-                
-                // Set persistence
-                await setPersistence(auth, browserLocalPersistence);
-                
-                // Export for use in admin.js
-                window.firebaseApp = currentApp;
-                window.firebaseAuth = auth;
-                window.firebaseDb = null; // Will be initialized after project selection
-                
-                console.log('Firebase Auth initialized');
-                
-            } catch (error) {
-                console.error('Error initializing Firebase Auth:', error);
-            }
-        }
-        
         // Reinitialize Firebase for a specific project
-        async function reinitializeFirebaseForProject(projectId) {
+        async function reinitializeFirebaseForProject(projectId, googleToken) {
             try {
                 console.log('Reinitializing Firebase for project:', projectId);
                 
@@ -471,16 +445,12 @@
                 
                 // Initialize new app
                 currentApp = initializeApp(firebaseConfig, 'project-' + projectId);
-                const auth = getAuth(currentApp);
                 const db = getFirestore(currentApp);
-                
-                // Set persistence
-                await setPersistence(auth, browserLocalPersistence);
                 
                 // Export for use in admin.js
                 window.firebaseApp = currentApp;
-                window.firebaseAuth = auth;
                 window.firebaseDb = db;
+                window.googleAuthToken = googleToken;
                 
                 console.log('Firebase reinitialized successfully');
                 
@@ -492,12 +462,9 @@
         
         // Listen for reinitialize events
         window.addEventListener('reinitializeFirebase', async (e) => {
-            const { projectId } = e.detail;
-            await reinitializeFirebaseForProject(projectId);
+            const { projectId, googleToken } = e.detail;
+            await reinitializeFirebaseForProject(projectId, googleToken);
         });
-        
-        // Initialize auth on load
-        await initializeFirebaseAuth();
         
         // Load admin script
         import('./js/admin.js').catch((error) => {

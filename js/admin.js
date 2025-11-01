@@ -2,13 +2,6 @@
 // Firebase Admin Panel - Main Script
 // ================================
 
-import { 
-    signInWithPopup,
-    GoogleAuthProvider,
-    signOut,
-    onAuthStateChanged 
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-
 import {
     collection,
     getDocs,
@@ -48,43 +41,21 @@ const state = {
 };
 
 // Get Firebase instances - with fallback check
-let auth = null;
 let db = null;
 
 // Check for Firebase initialization
 function checkFirebaseInit() {
-    if (window.firebaseAuth) {
-        auth = window.firebaseAuth;
-    } else {
-        console.warn('Firebase Auth not yet initialized');
-    }
-    
     if (window.firebaseDb) {
         db = window.firebaseDb;
     } else {
         console.warn('Firebase Db not yet initialized');
     }
     
-    return auth && db;
+    return db;
 }
 
 // Initial check
 checkFirebaseInit();
-
-// Poll for Firebase initialization (with timeout)
-let initCheckCount = 0;
-const maxInitChecks = 50; // 5 seconds max wait
-const initCheckInterval = setInterval(() => {
-    initCheckCount++;
-    if (checkFirebaseInit() || initCheckCount >= maxInitChecks) {
-        clearInterval(initCheckInterval);
-        if (auth && db) {
-            console.log('Firebase initialized successfully');
-        } else {
-            console.error('Firebase initialization timeout');
-        }
-    }
-}, 100);
 
 // ================================
 // DOM Elements
@@ -183,34 +154,64 @@ const elements = {
 // Authentication
 // ================================
 
-// Google Sign-In
+// Google Sign-In через Google Identity Services
 async function handleGoogleSignIn() {
-    if (!auth) {
-        showError(elements.loginError, 'Firebase Auth не инициализирован. Подождите...');
-        return;
-    }
-    
     try {
         elements.googleSignInBtn.disabled = true;
         elements.googleSignInBtn.textContent = 'Вход...';
         elements.loginError.textContent = '';
         
-        const provider = new GoogleAuthProvider();
-        provider.addScope('https://www.googleapis.com/auth/cloud-platform');
-        provider.setCustomParameters({
-            prompt: 'select_account'  // Всегда показывать окно выбора аккаунта
+        // Используем Google Identity Services
+        const tokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: '595990012513-2l6fbj7uk6qj36dc081bp05lqn607qhs.apps.googleusercontent.com', // Client ID для Google OAuth
+            scope: 'https://www.googleapis.com/auth/cloud-platform',
+            callback: async (tokenResponse) => {
+                if (tokenResponse.error) {
+                    console.error('OAuth error:', tokenResponse.error);
+                    showError(elements.loginError, 'Ошибка авторизации: ' + tokenResponse.error);
+                    elements.googleSignInBtn.disabled = false;
+                    elements.googleSignInBtn.textContent = 'Войти через Google';
+                    return;
+                }
+                
+                // Сохраняем токен
+                window.googleAuthToken = tokenResponse.access_token;
+                localStorage.setItem('googleAuthToken', tokenResponse.access_token);
+                
+                // Получаем информацию о пользователе
+                try {
+                    const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                        headers: {
+                            'Authorization': `Bearer ${tokenResponse.access_token}`
+                        }
+                    });
+                    const userInfo = await response.json();
+                    
+                    state.currentUser = {
+                        email: userInfo.email,
+                        displayName: userInfo.name,
+                        photoURL: userInfo.picture
+                    };
+                    
+                    showToast('Вход выполнен успешно', 'success');
+                    
+                    // Снимаем флаг первой загрузки - пользователь явно вошел
+                    state.isInitialLoad = false;
+                    
+                    // После успешной авторизации проверяем проекты
+                    checkProjectsAndShowScreen();
+                    
+                } catch (error) {
+                    console.error('Error fetching user info:', error);
+                    showError(elements.loginError, 'Ошибка получения данных пользователя');
+                    elements.googleSignInBtn.disabled = false;
+                    elements.googleSignInBtn.textContent = 'Войти через Google';
+                }
+            }
         });
         
-        const result = await signInWithPopup(auth, provider);
-        state.currentUser = result.user;
-        
-        showToast('Вход выполнен успешно', 'success');
-        
-        // Снимаем флаг первой загрузки - пользователь явно вошел
-        state.isInitialLoad = false;
-        
-        // После успешной авторизации проверяем проекты
-        checkProjectsAndShowScreen();
+        // Запускаем процесс авторизации
+        tokenClient.requestAccessToken({ prompt: 'consent' });
         
     } catch (error) {
         console.error('Google Sign-In error:', error);
@@ -244,7 +245,10 @@ async function initializeFirebaseForProject(project) {
         
         // Отправляем событие для реинициализации Firebase
         window.dispatchEvent(new CustomEvent('reinitializeFirebase', {
-            detail: { projectId: project.id }
+            detail: { 
+                projectId: project.id,
+                googleToken: window.googleAuthToken 
+            }
         }));
         
         state.currentProject = project;
@@ -283,13 +287,9 @@ function waitForFirebaseInit() {
 // Logout
 if (elements.logoutBtn) {
     elements.logoutBtn.addEventListener('click', async () => {
-        if (!auth) {
-            console.error('Auth not initialized');
-            return;
-        }
-        
         try {
-            await signOut(auth);
+            // Очищаем токен
+            window.googleAuthToken = null;
             showToast('Выход выполнен', 'info');
             resetState();
         } catch (error) {
@@ -299,14 +299,60 @@ if (elements.logoutBtn) {
 }
 
 // Показать экран выбора проекта
-function showProjectSelectionScreen() {
+async function showProjectSelectionScreen() {
     if (!elements.projectSelectionScreen) return;
     
     elements.loginScreen.style.display = 'none';
     elements.adminPanel.style.display = 'none';
     elements.projectSelectionScreen.style.display = 'flex';
     
-    renderProjectsList();
+    // Загружаем проекты из Google Cloud
+    await loadAndShowUserProjects();
+}
+
+// Загрузить и показать Firebase проекты пользователя
+async function loadAndShowUserProjects() {
+    if (!window.googleAuthToken) {
+        renderProjectsList();
+        return;
+    }
+    
+    try {
+        showLoading();
+        
+        // Получаем все проекты
+        const allProjects = await ProjectManager.fetchUserProjects(window.googleAuthToken);
+        
+        // Фильтруем только Firebase проекты
+        const firebaseProjects = [];
+        for (const project of allProjects) {
+            const isFirebase = await ProjectManager.isFirebaseProject(project.projectId, window.googleAuthToken);
+            if (isFirebase) {
+                firebaseProjects.push(project);
+                
+                // Автоматически добавляем в projectManager, если еще нет
+                try {
+                    projectManager.addProject(project.projectId, project.name || project.displayName);
+                } catch (e) {
+                    // Проект уже существует, пропускаем
+                }
+            }
+        }
+        
+        hideLoading();
+        
+        // Показываем список
+        renderProjectsList();
+        
+    } catch (error) {
+        console.error('Error loading projects:', error);
+        hideLoading();
+        
+        // Показываем только локально сохраненные проекты
+        renderProjectsList();
+        
+        showToast('Не удалось загрузить проекты из Google Cloud', 'warning');
+    }
 }
 
 // Отрисовать список проектов
@@ -421,41 +467,47 @@ async function addNewProject() {
     }
 }
 
-// Auth State Observer - setup when auth is ready
-function setupAuthObserver() {
-    if (!auth) {
-        console.warn('Auth not ready, retrying...');
-        setTimeout(setupAuthObserver, 500);
-        return;
-    }
-    
-    onAuthStateChanged(auth, (user) => {
-        state.currentUser = user;
+// Проверить сохраненный токен при загрузке
+function checkSavedToken() {
+    // Проверяем, есть ли сохраненный токен в localStorage
+    const savedToken = localStorage.getItem('googleAuthToken');
+    if (savedToken && state.isInitialLoad) {
+        window.googleAuthToken = savedToken;
         
-        if (user) {
-            if (elements.userEmail) {
-                elements.userEmail.textContent = user.email || user.displayName || 'Пользователь';
+        // Пытаемся получить информацию о пользователе
+        fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+            headers: {
+                'Authorization': `Bearer ${savedToken}`
             }
-            
-            // При первой загрузке всегда показываем экран входа
-            // Только после явного клика на "Войти через Google" переходим к выбору проекта
-            if (state.isInitialLoad) {
-                showLoginScreen();
-            } else {
-                // Проверяем проекты и показываем нужный экран
+        })
+        .then(response => response.json())
+        .then(userInfo => {
+            if (userInfo.email) {
+                state.currentUser = {
+                    email: userInfo.email,
+                    displayName: userInfo.name,
+                    photoURL: userInfo.picture
+                };
+                state.isInitialLoad = false;
                 checkProjectsAndShowScreen();
+            } else {
+                // Токен не валидный, показываем экран входа
+                localStorage.removeItem('googleAuthToken');
+                showLoginScreen();
             }
-            
-        } else {
+        })
+        .catch(() => {
+            // Токен не валидный
+            localStorage.removeItem('googleAuthToken');
             showLoginScreen();
-        }
-    });
-    
-    console.log('Auth observer setup complete');
+        });
+    } else {
+        showLoginScreen();
+    }
 }
 
 // Try to setup auth observer immediately
-setupAuthObserver();
+checkSavedToken();
 
 // ================================
 // Initialize Event Listeners
@@ -1496,6 +1548,9 @@ function resetState() {
     state.currentPage = 1;
     state.totalPages = 0;
     state.editingDocId = null;
+    state.currentUser = null;
+    state.currentProject = null;
+    state.isInitialLoad = true;
     
     if (elements.collectionInput) {
         elements.collectionInput.value = '';
@@ -1506,6 +1561,9 @@ function resetState() {
     if (elements.emptyState) {
         elements.emptyState.style.display = 'none';
     }
+    
+    // Очищаем токен
+    localStorage.removeItem('googleAuthToken');
     
     // Show collections view
     showView('collections');

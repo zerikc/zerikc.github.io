@@ -224,6 +224,55 @@ export class ProjectManager {
     }
 
     /**
+     * Получить список Firebase проектов пользователя через Google Cloud API
+     * @param {string} accessToken - Google OAuth токен
+     * @returns {Promise<Array>} - Список проектов
+     */
+    static async fetchUserProjects(accessToken) {
+        try {
+            // Получаем все проекты через Cloud Resource Manager API
+            const response = await fetch('https://cloudresourcemanager.googleapis.com/v1/projects', {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Failed to fetch projects: ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            return data.projects || [];
+            
+        } catch (error) {
+            console.error('Error fetching projects:', error);
+            throw error;
+        }
+    }
+    
+    /**
+     * Проверить, является ли проект Firebase проектом
+     * @param {string} projectId - Project ID
+     * @param {string} accessToken - Google OAuth токен
+     * @returns {Promise<boolean>} - true если проект имеет Firebase
+     */
+    static async isFirebaseProject(projectId, accessToken) {
+        try {
+            // Проверяем через Firebase Management API
+            const response = await fetch(`https://firebase.googleapis.com/v1beta1/projects/${projectId}`, {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            });
+            
+            return response.ok;
+            
+        } catch (error) {
+            return false;
+        }
+    }
+    
+    /**
      * Построить конфигурацию Firebase из Project ID
      * @param {string} projectId - Firebase Project ID
      * @param {object} customConfig - Дополнительная конфигурация (опционально)
