@@ -35,3 +35,6 @@ yarn-error.log*
 node_modules/
 dist/
 build/
+
+# OAuth credentials (sensitive)
+client_secret_*.json

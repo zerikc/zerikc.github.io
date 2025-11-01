@@ -168,7 +168,7 @@ async function handleGoogleSignIn() {
         
         // Используем Google Identity Services
         const tokenClient = google.accounts.oauth2.initTokenClient({
-            client_id: '595990012513-2l6fbj7uk6qj36dc081bp05lqn607qhs.apps.googleusercontent.com', // Client ID для Google OAuth
+            client_id: '974852900993-neldo0t6ldgo1qfpo51tfdkla9a0pvps.apps.googleusercontent.com', // Client ID для Google OAuth
             scope: 'https://www.googleapis.com/auth/cloud-platform',
             callback: async (tokenResponse) => {
                 if (tokenResponse.error) {
@@ -314,8 +314,8 @@ async function showProjectSelectionScreen() {
     // Показываем локально сохраненные проекты
     renderProjectsList();
     
-    // TODO: В будущем можно добавить автоматическую загрузку проектов из Google Cloud
-    // await loadAndShowUserProjects();
+    // Загружаем проекты из Google Cloud
+    await loadAndShowUserProjects();
 }
 
 // Загрузить и показать Firebase проекты пользователя
