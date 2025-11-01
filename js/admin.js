@@ -329,6 +329,7 @@ async function showProjectSelectionScreen() {
 // Загрузить и показать Firebase проекты пользователя
 async function loadAndShowUserProjects() {
     if (!window.googleAuthToken) {
+        console.log('No Google auth token, skipping project load');
         renderProjectsList();
         return;
     }
@@ -336,14 +337,19 @@ async function loadAndShowUserProjects() {
     try {
         showLoading();
         
+        console.log('Loading projects from Google Cloud...');
+        
         // Получаем все проекты
         const allProjects = await ProjectManager.fetchUserProjects(window.googleAuthToken);
+        console.log('All projects received:', allProjects);
         
         // Фильтруем только Firebase проекты
         const firebaseProjects = [];
         for (const project of allProjects) {
+            console.log('Checking if project is Firebase:', project.projectId);
             const isFirebase = await ProjectManager.isFirebaseProject(project.projectId, window.googleAuthToken);
             if (isFirebase) {
+                console.log('Project is Firebase:', project.projectId);
                 firebaseProjects.push(project);
                 
                 // Автоматически добавляем в projectManager, если еще нет
@@ -354,6 +360,8 @@ async function loadAndShowUserProjects() {
                 }
             }
         }
+        
+        console.log('Firebase projects found:', firebaseProjects);
         
         hideLoading();
         
