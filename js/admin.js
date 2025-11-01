@@ -266,10 +266,31 @@ async function initializeFirebaseForProject(project) {
         
         state.currentProject = project;
         
+        // Очищаем старые данные коллекций перед переключением проекта
+        state.collections = [];
+        if (elements.collectionsList) {
+            elements.collectionsList.innerHTML = '';
+        }
+        
         // Ждем инициализации Firebase
         await waitForFirebaseInit();
         
+        // Убеждаемся, что db обновлен
+        checkFirebaseInit();
+        
         showAdminPanel();
+        
+        // После переключения проекта явно загружаем коллекции
+        // так как showAdminPanel() вызывает loadAllCollections() с задержкой,
+        // которая может не учесть обновленную db
+        setTimeout(async () => {
+            checkFirebaseInit();
+            if (db) {
+                console.log('Loading collections after project switch...');
+                await loadAllCollections();
+                // Статистика обновится автоматически в loadAllCollections() через updateStatistics()
+            }
+        }, 300);
         
     } catch (error) {
         console.error('Error initializing Firebase:', error);
