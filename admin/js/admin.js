@@ -197,6 +197,9 @@ async function handleGoogleSignIn() {
         
         const provider = new GoogleAuthProvider();
         provider.addScope('https://www.googleapis.com/auth/cloud-platform');
+        provider.setCustomParameters({
+            prompt: 'select_account'  // Всегда показывать окно выбора аккаунта
+        });
         
         const result = await signInWithPopup(auth, provider);
         state.currentUser = result.user;
