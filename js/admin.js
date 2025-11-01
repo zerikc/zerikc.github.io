@@ -322,8 +322,8 @@ async function showProjectSelectionScreen() {
     // Показываем локально сохраненные проекты
     renderProjectsList();
     
-    // TODO: Загружаем проекты из Google Cloud (требует включения API и настройки прав)
-    // await loadAndShowUserProjects();
+    // Загружаем проекты из Google Cloud
+    await loadAndShowUserProjects();
 }
 
 // Загрузить и показать Firebase проекты пользователя
