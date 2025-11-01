@@ -46,7 +46,23 @@ https://192.168.1.138/
 - `https://www.googleapis.com/auth/userinfo.email`
 - `https://www.googleapis.com/auth/userinfo.profile`
 
+### 4. Включение необходимых APIs
+⚠️ **ВАЖНО**: Для автоматической загрузки проектов нужно включить следующие APIs в проекте `firebase-476911`:
+
+1. Перейдите в **APIs & Services** → **Library**
+2. Включите следующие APIs:
+   - **Cloud Resource Manager API** (для списка проектов)
+   - **Firebase Management API** (для проверки Firebase проектов)
+   
+**Как включить API:**
+1. Найдите API по названию в поиске
+2. Нажмите на API
+3. Нажмите кнопку **Enable** (Включить)
+4. Дождитесь активации
+
 ## Шаги настройки
+
+### Шаг 1: Настройка OAuth Client
 
 1. Перейдите в [Google Cloud Console](https://console.cloud.google.com/)
 2. Выберите проект `firebase-476911`
