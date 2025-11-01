@@ -54,7 +54,9 @@ https://192.168.1.138/
 4. Найдите OAuth Client ID `974852900993-neldo0t6ldgo1qfpo51tfdkla9a0pvps`
 5. Нажмите **Edit** (Edit OAuth client)
 6. Добавьте **Authorized JavaScript origins** (см. выше)
-7. При необходимости добавьте **Authorized redirect URIs** (см. выше)
+7. ⚠️ **ВАЖНО**: Добавьте **Authorized redirect URIs** (см. выше)
+   - Сейчас у вас только `https://zerikc.github.io/oauth.php?provider=google`
+   - Нужно добавить все URIs из списка выше
 8. Сохраните изменения
 
 ## OAuth Consent Screen
