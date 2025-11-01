@@ -169,7 +169,7 @@ async function handleGoogleSignIn() {
         // Используем Google Identity Services
         const tokenClient = google.accounts.oauth2.initTokenClient({
             client_id: '974852900993-neldo0t6ldgo1qfpo51tfdkla9a0pvps.apps.googleusercontent.com', // Client ID для Google OAuth
-            scope: 'https://www.googleapis.com/auth/cloud-platform',
+            scope: 'https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
             callback: async (tokenResponse) => {
                 if (tokenResponse.error) {
                     console.error('OAuth error:', tokenResponse.error);
