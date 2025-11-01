@@ -161,6 +161,11 @@ async function handleGoogleSignIn() {
         elements.googleSignInBtn.textContent = 'Вход...';
         elements.loginError.textContent = '';
         
+        // Проверяем, загружена ли библиотека Google Identity Services
+        if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
+            throw new Error('Библиотека Google Identity Services не загружена. Пожалуйста, обновите страницу.');
+        }
+        
         // Используем Google Identity Services
         const tokenClient = google.accounts.oauth2.initTokenClient({
             client_id: '595990012513-2l6fbj7uk6qj36dc081bp05lqn607qhs.apps.googleusercontent.com', // Client ID для Google OAuth
