@@ -747,12 +747,6 @@ async function loadAllCollections() {
         return;
     }
     
-    if (!auth) {
-        console.error('Firebase auth is not initialized');
-        showToast('Ошибка: Firebase Auth не инициализирован. Проверьте консоль браузера.', 'error');
-        return;
-    }
-    
     state.collectionsLoading = true;
     if (elements.collectionsList) {
         elements.collectionsList.innerHTML = '';
