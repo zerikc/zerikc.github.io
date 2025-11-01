@@ -969,6 +969,19 @@ section {
     margin-bottom: var(--spacing-sm);
 }
 
+.app-mini-status-live {
+    background: rgba(52, 199, 89, 0.15);
+    border-color: rgba(52, 199, 89, 0.4);
+    color: #34C759;
+    font-weight: 600;
+}
+
+[data-theme="light"] .app-mini-status-live {
+    background: rgba(52, 199, 89, 0.2);
+    border-color: rgba(52, 199, 89, 0.5);
+    color: #248A3D;
+}
+
 .app-mini-card.active .app-mini-status {
     background: rgba(0, 122, 255, 0.2);
     border-color: rgba(0, 122, 255, 0.4);
