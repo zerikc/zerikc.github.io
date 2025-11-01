@@ -190,6 +190,11 @@ async function handleGoogleSignIn() {
                             'Authorization': `Bearer ${tokenResponse.access_token}`
                         }
                     });
+                    
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch user info: ${response.status}`);
+                    }
+                    
                     const userInfo = await response.json();
                     
                     state.currentUser = {
