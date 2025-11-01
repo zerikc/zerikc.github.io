@@ -1567,8 +1567,8 @@ function resetState() {
     // Очищаем токен
     localStorage.removeItem('googleAuthToken');
     
-    // Show collections view
-    showView('collections');
+    // Показываем экран входа
+    showLoginScreen();
     
     // Reset pagination
     if (elements.pageInfo) {
