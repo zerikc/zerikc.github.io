@@ -192,10 +192,13 @@ async function handleGoogleSignIn() {
                     });
                     
                     if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error('Userinfo error:', response.status, errorText);
                         throw new Error(`Failed to fetch user info: ${response.status}`);
                     }
                     
                     const userInfo = await response.json();
+                    console.log('User info received:', userInfo);
                     
                     state.currentUser = {
                         email: userInfo.email,
