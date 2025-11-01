@@ -306,8 +306,11 @@ async function showProjectSelectionScreen() {
     elements.adminPanel.style.display = 'none';
     elements.projectSelectionScreen.style.display = 'flex';
     
-    // Загружаем проекты из Google Cloud
-    await loadAndShowUserProjects();
+    // Показываем локально сохраненные проекты
+    renderProjectsList();
+    
+    // TODO: В будущем можно добавить автоматическую загрузку проектов из Google Cloud
+    // await loadAndShowUserProjects();
 }
 
 // Загрузить и показать Firebase проекты пользователя
