@@ -465,16 +465,23 @@
             }
         });
         
-        // Initialize theme immediately
-        initTheme();
-        
-        // Theme toggle button
-        document.addEventListener('DOMContentLoaded', () => {
+        // Initialize theme and toggle button
+        function setupThemeToggle() {
+            initTheme();
+            
+            // Theme toggle button
             const themeToggle = document.getElementById('themeToggle');
             if (themeToggle) {
                 themeToggle.addEventListener('click', toggleTheme);
             }
-        });
+        }
+        
+        // Setup immediately if DOM is ready, otherwise wait
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setupThemeToggle);
+        } else {
+            setupThemeToggle();
+        }
     </script>
     
     <!-- Firebase SDK -->
