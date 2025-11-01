@@ -400,6 +400,7 @@
     /* Colors - Legacy */
     --apple-blue: var(--system-blue);
     --apple-blue-dark: #0051D5;
+    --apple-blue-hover: #0051D5;
     --apple-green: var(--system-green);
     --apple-red: var(--system-red);
     --apple-orange: var(--system-orange);
