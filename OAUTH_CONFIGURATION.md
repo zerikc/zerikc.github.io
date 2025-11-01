@@ -61,11 +61,23 @@ https://192.168.1.138/
 
 ## OAuth Consent Screen
 
-Если запрошена проверка приложения:
+⚠️ **КРИТИЧЕСКИ ВАЖНО**: Настройте тип доступа!
+
 1. Перейдите в **APIs & Services** → **OAuth consent screen**
-2. Добавьте все необходимые scopes
-3. Заполните описание приложения
-4. Отправьте на проверку (если требуется)
+2. Выберите **User type**:
+   - **Internal** — только для пользователей вашей организации (требует Google Workspace)
+   - **External** — для всех пользователей (рекомендуется для публичных приложений)
+3. Заполните обязательные поля:
+   - **App name**: `Firebase Admin Console`
+   - **User support email**: ваш email
+   - **Developer contact**: ваш email
+4. Добавьте все необходимые scopes в разделе **Scopes**:
+   - `https://www.googleapis.com/auth/cloud-platform`
+   - `https://www.googleapis.com/auth/userinfo.email`
+   - `https://www.googleapis.com/auth/userinfo.profile`
+5. В разделе **Test users** добавьте email: `zerikc123@gmail.com`
+6. **Save and Continue** через все шаги
+7. Если приложение **External**, отправьте на проверку Google (при необходимости)
 
 ## Тестирование
 
