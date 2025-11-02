@@ -117,6 +117,61 @@
         .contact-box h3 {
             margin-top: 0;
         }
+        
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .legal-page {
+                padding-top: 80px;
+                padding-bottom: var(--spacing-xl);
+            }
+            
+            .legal-content {
+                padding: var(--spacing-lg);
+                margin: 0 var(--spacing-md);
+            }
+            
+            .legal-header {
+                margin-bottom: var(--spacing-lg);
+            }
+            
+            .legal-content h2 {
+                font-size: var(--font-size-lg);
+                margin-top: var(--spacing-lg);
+            }
+            
+            .legal-content h3 {
+                font-size: var(--font-size-base);
+            }
+            
+            .legal-content ul, .legal-content ol {
+                padding-left: var(--spacing-md);
+            }
+            
+            .warning-box,
+            .contact-box {
+                padding: var(--spacing-md);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .legal-page {
+                padding-top: 70px;
+                padding-bottom: var(--spacing-lg);
+            }
+            
+            .legal-content {
+                padding: var(--spacing-md);
+                margin: 0 var(--spacing-sm);
+            }
+            
+            .legal-title {
+                font-size: 1.75rem;
+            }
+            
+            .back-link {
+                font-size: var(--font-size-sm);
+            }
+        }
     </style>
 </head>
 <body>

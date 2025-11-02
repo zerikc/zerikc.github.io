@@ -732,18 +732,7 @@ body {
 
 @media (max-width: 768px) {
     .section-dots {
-        right: var(--spacing-sm);
-        gap: var(--spacing-xs);
-    }
-    
-    .dot {
-        width: 10px;
-        height: 10px;
-    }
-    
-    .dot::before {
-        width: 4px;
-        height: 4px;
+        display: none;
     }
 }
 
