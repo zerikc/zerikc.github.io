@@ -682,11 +682,28 @@
                 // Обновление активных точек
                 updateActiveDot();
                 
-                // Parallax эффект для градиентных орбов
-                gradientOrbs.forEach((orb, index) => {
-                    const speed = (index + 1) * 0.15;
-                    orb.style.transform = `translateY(${scrolled * speed}px)`;
-                });
+                // Затемнение фона героя при скролле
+                const heroOverlay = document.getElementById('heroBackgroundOverlay');
+                if (heroOverlay) {
+                    const heroSection = document.querySelector('.hero');
+                    if (heroSection) {
+                        const heroHeight = heroSection.offsetHeight;
+                        const scrollProgress = Math.min(scrolled / heroHeight, 1);
+                        
+                        // Затемняем от 0 до 0.6 (60% затемнение)
+                        const darkOpacity = scrollProgress * 0.6;
+                        
+                        if (document.documentElement.getAttribute('data-theme') === 'light' || 
+                            (!document.documentElement.getAttribute('data-theme') && 
+                             window.matchMedia('(prefers-color-scheme: light)').matches)) {
+                            // Для светлой темы используем белый overlay
+                            heroOverlay.style.background = `rgba(255, 255, 255, ${darkOpacity})`;
+                        } else {
+                            // Для темной темы используем черный overlay
+                            heroOverlay.style.background = `rgba(0, 0, 0, ${darkOpacity})`;
+                        }
+                    }
+                }
                 
                 scrollTicking = false;
             });

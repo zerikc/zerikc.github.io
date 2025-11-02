@@ -438,12 +438,34 @@ body {
 }
 
 .hero-background {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
     overflow: hidden;
+    z-index: -1;
+}
+
+.hero-background-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0);
+    transition: background 0.1s ease-out;
+    z-index: 1;
+}
+
+[data-theme="light"] .hero-background-overlay {
+    background: rgba(255, 255, 255, 0);
+}
+
+@media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) .hero-background-overlay {
+        background: rgba(255, 255, 255, 0);
+    }
 }
 
 .gradient-orb {
@@ -468,7 +490,7 @@ body {
 .orb-1 {
     width: 600px;
     height: 600px;
-    background: radial-gradient(circle, var(--primary-color), transparent);
+    background: radial-gradient(circle, #007AFF, transparent);
     top: -200px;
     left: -200px;
     animation-delay: 0s;
@@ -477,7 +499,7 @@ body {
 .orb-2 {
     width: 500px;
     height: 500px;
-    background: radial-gradient(circle, var(--secondary-color), transparent);
+    background: radial-gradient(circle, #5856D6, transparent);
     bottom: -150px;
     right: -150px;
     animation-delay: 5s;
@@ -486,7 +508,7 @@ body {
 .orb-3 {
     width: 400px;
     height: 400px;
-    background: radial-gradient(circle, var(--accent-color), transparent);
+    background: radial-gradient(circle, #FF3B30, transparent);
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -501,7 +523,7 @@ body {
 
 .hero-content {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     text-align: center;
     max-width: 900px;
     margin: 0 auto;
