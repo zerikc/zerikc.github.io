@@ -54,7 +54,8 @@ const state = {
         reads: [],
         writes: [],
         deletes: [],
-        timestamps: []
+        timestamps: [],
+        hourlyData: {} // Почасовые данные за последние 24 часа
     }
 };
 
@@ -78,6 +79,8 @@ checkFirebaseInit();
 function trackFirestoreOperation(type, count = 1) {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const currentHour = now.getHours();
+    const hourKey = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}-${currentHour}`;
     
     // Load from localStorage
     const storageKey = 'firestoreUsage';
@@ -87,8 +90,30 @@ function trackFirestoreOperation(type, count = 1) {
     if (!usage.writes) usage.writes = [];
     if (!usage.deletes) usage.deletes = [];
     if (!usage.timestamps) usage.timestamps = [];
+    if (!usage.hourlyData) usage.hourlyData = {};
     
-    // Add today's data if not exists
+    // Track hourly data
+    if (!usage.hourlyData[hourKey]) {
+        usage.hourlyData[hourKey] = { reads: 0, writes: 0, deletes: 0, timestamp: now.getTime() };
+    }
+    
+    if (type === 'read') {
+        usage.hourlyData[hourKey].reads = (usage.hourlyData[hourKey].reads || 0) + count;
+    } else if (type === 'write') {
+        usage.hourlyData[hourKey].writes = (usage.hourlyData[hourKey].writes || 0) + count;
+    } else if (type === 'delete') {
+        usage.hourlyData[hourKey].deletes = (usage.hourlyData[hourKey].deletes || 0) + count;
+    }
+    
+    // Clean old hourly data (keep only last 48 hours)
+    const cutoffTime = now.getTime() - (48 * 60 * 60 * 1000);
+    Object.keys(usage.hourlyData).forEach(key => {
+        if (usage.hourlyData[key].timestamp < cutoffTime) {
+            delete usage.hourlyData[key];
+        }
+    });
+    
+    // Add today's data if not exists (daily tracking)
     const todayIndex = usage.timestamps.findIndex(t => new Date(t).setHours(0,0,0,0) === today);
     if (todayIndex === -1) {
         usage.timestamps.push(new Date(today).toISOString());
@@ -121,8 +146,9 @@ function trackFirestoreOperation(type, count = 1) {
     // Update state
     state.firestoreUsage = usage;
     
-    // Update chart
-    updateFirestoreChart();
+    // Update charts
+    updateHourlyChart();
+    updateDailyChart();
 }
 
 function loadFirestoreUsage() {
@@ -133,9 +159,11 @@ function loadFirestoreUsage() {
     if (!usage.writes) usage.writes = [];
     if (!usage.deletes) usage.deletes = [];
     if (!usage.timestamps) usage.timestamps = [];
+    if (!usage.hourlyData) usage.hourlyData = {};
     
     state.firestoreUsage = usage;
-    updateFirestoreChart();
+    updateHourlyChart();
+    updateDailyChart();
 }
 
 // ================================
@@ -935,8 +963,7 @@ function updateStatistics() {
     if (elements.totalDocuments) elements.totalDocuments.textContent = totalDocsText;
     if (elements.restrictedCollections) elements.restrictedCollections.textContent = restricted;
     
-    // Update Firestore usage stats
-    updateFirestoreStats();
+    // Charts will update automatically via loadFirestoreUsage()
 }
 
 function updateFirestoreStats() {
@@ -975,15 +1002,70 @@ function updateFirestoreStats() {
     if (totalReadsEl) totalReadsEl.textContent = last7DaysReads.toLocaleString('ru-RU');
 }
 
-function updateFirestoreChart() {
-    const canvas = document.getElementById('firestoreUsageChart');
+// ================================
+// Hourly Chart (24 hours)
+// ================================
+
+function updateHourlyChart() {
+    const canvas = document.getElementById('hourlyChart');
     if (!canvas) return;
     
-    // Set canvas size based on container - увеличиваем высоту для лучшей читаемости
+    // Set canvas size
     const container = canvas.parentElement;
     if (container && container.offsetWidth) {
         const containerWidth = container.offsetWidth;
-        const aspectRatio = 600 / 300; // Увеличили высоту графика
+        const aspectRatio = 600 / 280;
+        canvas.width = containerWidth;
+        canvas.height = Math.round(canvas.width / aspectRatio);
+    }
+    
+    const ctx = canvas.getContext('2d');
+    const usage = state.firestoreUsage;
+    
+    if (!usage.hourlyData || Object.keys(usage.hourlyData).length === 0) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const textColor = getComputedStyle(document.documentElement).getPropertyValue('--apple-text-secondary') || '#666';
+        ctx.fillStyle = textColor;
+        ctx.font = '14px -apple-system, BlinkMacSystemFont, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Нет данных', canvas.width / 2, canvas.height / 2);
+        return;
+    }
+    
+    // Prepare hourly data for last 24 hours
+    const now = new Date();
+    const hours = [];
+    const reads = [];
+    const writes = [];
+    const deletes = [];
+    
+    for (let i = 23; i >= 0; i--) {
+        const hourDate = new Date(now.getTime() - i * 60 * 60 * 1000);
+        const hour = hourDate.getHours();
+        const hourKey = `${hourDate.getFullYear()}-${hourDate.getMonth()}-${hourDate.getDate()}-${hour}`;
+        
+        hours.push(hour);
+        reads.push(usage.hourlyData[hourKey]?.reads || 0);
+        writes.push(usage.hourlyData[hourKey]?.writes || 0);
+        deletes.push(usage.hourlyData[hourKey]?.deletes || 0);
+    }
+    
+    drawLineChart(ctx, canvas, hours, reads, writes, deletes, true);
+}
+
+// ================================
+// Daily Chart (7 days)
+// ================================
+
+function updateDailyChart() {
+    const canvas = document.getElementById('dailyChart');
+    if (!canvas) return;
+    
+    // Set canvas size
+    const container = canvas.parentElement;
+    if (container && container.offsetWidth) {
+        const containerWidth = container.offsetWidth;
+        const aspectRatio = 600 / 280;
         canvas.width = containerWidth;
         canvas.height = Math.round(canvas.width / aspectRatio);
     }
@@ -1008,32 +1090,56 @@ function updateFirestoreChart() {
     const writes = usage.writes.slice(-daysToShow);
     const deletes = usage.deletes.slice(-daysToShow);
     
-    // Calculate max value for scaling (with some padding)
+    // Convert timestamps to day labels
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const labels = timestamps.map((timestamp, index) => {
+        const date = new Date(timestamp);
+        const chartDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        
+        if (chartDate.getTime() === today.getTime()) {
+            return 'Сегодня';
+        } else if (chartDate.getTime() === today.getTime() - 86400000) {
+            return 'Вчера';
+        } else {
+            const dayNames = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+            return dayNames[date.getDay()];
+        }
+    });
+    
+    drawLineChart(ctx, canvas, labels, reads, writes, deletes, false);
+}
+
+// ================================
+// Line Chart Drawing Function (Apple Style)
+// ================================
+
+function drawLineChart(ctx, canvas, labels, reads, writes, deletes, isHourly) {
+    // Calculate max value for scaling
     const allValues = [...reads, ...writes, ...deletes];
     const maxValue = Math.max(...allValues, 1);
-    const yAxisMax = Math.ceil(maxValue * 1.1); // Добавляем 10% отступа сверху
+    const yAxisMax = Math.ceil(maxValue * 1.15); // 15% padding
     
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Chart dimensions - увеличенные отступы для осей
+    // Chart dimensions
     const leftPadding = 60;
     const rightPadding = 20;
-    const topPadding = 40;
+    const topPadding = 30;
     const bottomPadding = 50;
     const chartWidth = canvas.width - leftPadding - rightPadding;
     const chartHeight = canvas.height - topPadding - bottomPadding;
     
-    // Colors with alpha for better visualization
-    const readColor = 'rgba(0, 122, 255, 0.8)';
-    const writeColor = 'rgba(52, 199, 89, 0.8)';
-    const deleteColor = 'rgba(255, 59, 48, 0.8)';
-    const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--apple-separator') || 'rgba(60, 60, 67, 0.3)';
-    const textColor = getComputedStyle(document.documentElement).getPropertyValue('--apple-text-primary') || '#000';
+    // Colors (Apple style)
+    const readColor = '#007AFF';
+    const writeColor = '#34C759';
+    const deleteColor = '#FF3B30';
+    const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--apple-separator') || 'rgba(60, 60, 67, 0.2)';
     const secondaryTextColor = getComputedStyle(document.documentElement).getPropertyValue('--apple-text-secondary') || '#666';
     
-    // Draw grid lines (Y-axis)
-    const gridLinesCount = 5;
+    // Draw grid lines
+    const gridLinesCount = 4;
     ctx.strokeStyle = gridColor;
     ctx.lineWidth = 0.5;
     ctx.setLineDash([2, 2]);
@@ -1052,108 +1158,147 @@ function updateFirestoreChart() {
         ctx.textAlign = 'right';
         ctx.textBaseline = 'middle';
         ctx.setLineDash([]);
-        ctx.fillText(value.toLocaleString('ru-RU'), leftPadding - 8, y);
+        if (value > 0) {
+            ctx.fillText(value.toLocaleString('ru-RU'), leftPadding - 10, y);
+        }
     }
     
     ctx.setLineDash([]);
     
-    // Calculate bar dimensions
-    const barSpacing = 8;
-    const groupWidth = chartWidth / daysToShow;
-    const barWidth = (groupWidth - barSpacing * 2) / 3;
+    // Calculate X positions
+    const dataPoints = labels.length;
+    const stepX = chartWidth / (dataPoints - 1 || 1);
     
-    // Draw grouped bars with better styling
-    timestamps.forEach((timestamp, index) => {
-        const groupX = leftPadding + index * groupWidth + barSpacing;
-        const baseY = topPadding + chartHeight;
+    // Draw area gradients under lines
+    function drawArea(ctx, points, color, baseY) {
+        if (points.length < 2) return;
         
-        const readValue = reads[index] || 0;
-        const writeValue = writes[index] || 0;
-        const deleteValue = deletes[index] || 0;
+        const rgbaColor = color === readColor ? 'rgba(0, 122, 255, 0.12)' :
+                          color === writeColor ? 'rgba(52, 199, 89, 0.12)' :
+                          'rgba(255, 59, 48, 0.12)';
         
-        const readHeight = (readValue / yAxisMax) * chartHeight;
-        const writeHeight = (writeValue / yAxisMax) * chartHeight;
-        const deleteHeight = (deleteValue / yAxisMax) * chartHeight;
+        ctx.fillStyle = rgbaColor;
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, baseY);
         
-        // Draw reads bar
-        if (readHeight > 0) {
-            ctx.fillStyle = readColor;
-            const borderRadius = 4;
-            ctx.beginPath();
-            ctx.roundRect(groupX, baseY - readHeight, barWidth, readHeight, borderRadius);
-            ctx.fill();
+        // Use smooth curve for area
+        points.forEach((point, i) => {
+            if (i === 0) {
+                ctx.lineTo(point.x, point.y);
+            } else {
+                const prev = points[i - 1];
+                const cp1x = prev.x + (point.x - prev.x) / 2;
+                const cp1y = prev.y;
+                const cp2x = prev.x + (point.x - prev.x) / 2;
+                const cp2y = point.y;
+                
+                ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, point.x, point.y);
+            }
+        });
+        
+        ctx.lineTo(points[points.length - 1].x, baseY);
+        ctx.closePath();
+        ctx.fill();
+    }
+    
+    // Draw lines
+    function drawLine(ctx, values, color, baseY) {
+        if (values.length < 2) return;
+        
+        const points = values.map((value, i) => ({
+            x: leftPadding + i * stepX,
+            y: baseY - (value / yAxisMax) * chartHeight
+        }));
+        
+        // Draw area
+        drawArea(ctx, points, color, baseY);
+        
+        // Draw line
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.5;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        
+        for (let i = 1; i < points.length; i++) {
+            // Smooth curve
+            const prev = points[i - 1];
+            const curr = points[i];
+            const cp1x = prev.x + (curr.x - prev.x) / 2;
+            const cp1y = prev.y;
+            const cp2x = prev.x + (curr.x - prev.x) / 2;
+            const cp2y = curr.y;
+            
+            ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, curr.x, curr.y);
         }
         
-        // Draw writes bar
-        if (writeHeight > 0) {
-            ctx.fillStyle = writeColor;
-            ctx.beginPath();
-            ctx.roundRect(groupX + barWidth + barSpacing, baseY - writeHeight, barWidth, writeHeight, 4);
-            ctx.fill();
-        }
+        ctx.stroke();
         
-        // Draw deletes bar
-        if (deleteHeight > 0) {
-            ctx.fillStyle = deleteColor;
-            ctx.beginPath();
-            ctx.roundRect(groupX + (barWidth + barSpacing) * 2, baseY - deleteHeight, barWidth, deleteHeight, 4);
-            ctx.fill();
-        }
-        
-        // Draw date label
-        const date = new Date(timestamp);
-        const now = new Date();
-        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const chartDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-        
-        let dateLabel;
-        if (chartDate.getTime() === today.getTime()) {
-            dateLabel = 'Сегодня';
-        } else if (chartDate.getTime() === today.getTime() - 86400000) {
-            dateLabel = 'Вчера';
-        } else {
-            const dayNames = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
-            dateLabel = dayNames[date.getDay()];
-        }
-        
-        ctx.fillStyle = secondaryTextColor;
-        ctx.font = '11px -apple-system, BlinkMacSystemFont, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'top';
-        ctx.fillText(dateLabel, leftPadding + index * groupWidth + groupWidth / 2, baseY + 8);
-        
-        // Day number below
-        ctx.font = '10px -apple-system, BlinkMacSystemFont, sans-serif';
-        ctx.fillText(date.getDate() + '.' + (date.getMonth() + 1), leftPadding + index * groupWidth + groupWidth / 2, baseY + 24);
-    });
+        // Draw points (only for values > 0 to avoid clutter)
+        points.forEach((point, i) => {
+            if (values[i] > 0) {
+                // Outer circle with color
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // White center for better visibility
+                ctx.fillStyle = '#FFFFFF';
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, 2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Outer ring
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, 4, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        });
+    }
+    
+    const baseY = topPadding + chartHeight;
+    
+    // Draw lines in order (deletes, writes, reads) so reads are on top
+    drawLine(ctx, deletes, deleteColor, baseY);
+    drawLine(ctx, writes, writeColor, baseY);
+    drawLine(ctx, reads, readColor, baseY);
     
     // Draw X-axis line
     ctx.strokeStyle = gridColor;
     ctx.lineWidth = 1;
+    ctx.setLineDash([]);
     ctx.beginPath();
-    ctx.moveTo(leftPadding, topPadding + chartHeight);
-    ctx.lineTo(leftPadding + chartWidth, topPadding + chartHeight);
+    ctx.moveTo(leftPadding, baseY);
+    ctx.lineTo(leftPadding + chartWidth, baseY);
     ctx.stroke();
     
-    // Update stats
-    updateFirestoreStats();
-}
-
-// Add roundRect polyfill if not available
-if (!CanvasRenderingContext2D.prototype.roundRect) {
-    CanvasRenderingContext2D.prototype.roundRect = function(x, y, width, height, radius) {
-        this.beginPath();
-        this.moveTo(x + radius, y);
-        this.lineTo(x + width - radius, y);
-        this.quadraticCurveTo(x + width, y, x + width, y + radius);
-        this.lineTo(x + width, y + height - radius);
-        this.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-        this.lineTo(x + radius, y + height);
-        this.quadraticCurveTo(x, y + height, x, y + height - radius);
-        this.lineTo(x, y + radius);
-        this.quadraticCurveTo(x, y, x + radius, y);
-        this.closePath();
-    };
+    // Draw X-axis labels
+    ctx.fillStyle = secondaryTextColor;
+    ctx.font = '11px -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    
+    labels.forEach((label, i) => {
+        const x = leftPadding + i * stepX;
+        
+        if (isHourly) {
+            // Format hour label (0-23 to "00:00", "01:00", etc.)
+            const hour = typeof label === 'number' ? label : parseInt(label);
+            const hourStr = String(hour).padStart(2, '0') + ':00';
+            
+            // Show only every 3 hours to avoid clutter
+            if (hour % 3 === 0 || i === labels.length - 1) {
+                ctx.fillText(hourStr, x, baseY + 8);
+            }
+        } else {
+            ctx.fillText(label.toString(), x, baseY + 8);
+        }
+    });
 }
 
 // Render collections list (Apple style)

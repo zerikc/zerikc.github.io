@@ -303,44 +303,52 @@
                         </div>
                     </div>
                     
-                    <!-- Firestore Usage Chart -->
+                    <!-- Firestore Usage Charts -->
+                    <!-- Hourly Chart (24 hours) -->
                     <div class="stat-chart-card">
                         <div class="stat-chart-header">
-                            <h2 class="stat-chart-title">Использование Firestore</h2>
+                            <h2 class="stat-chart-title">Последние 24 часа</h2>
                             <div class="stat-chart-legend">
                                 <div class="chart-legend-item">
-                                    <span class="chart-legend-color" style="background: var(--system-blue);"></span>
+                                    <span class="chart-legend-color" style="background: #007AFF;"></span>
                                     <span>Reads</span>
                                 </div>
                                 <div class="chart-legend-item">
-                                    <span class="chart-legend-color" style="background: var(--system-green);"></span>
+                                    <span class="chart-legend-color" style="background: #34C759;"></span>
                                     <span>Writes</span>
                                 </div>
                                 <div class="chart-legend-item">
-                                    <span class="chart-legend-color" style="background: var(--system-red);"></span>
+                                    <span class="chart-legend-color" style="background: #FF3B30;"></span>
                                     <span>Deletes</span>
                                 </div>
                             </div>
                         </div>
                         <div class="stat-chart-container">
-                            <canvas id="firestoreUsageChart" width="600" height="300"></canvas>
+                            <canvas id="hourlyChart" width="600" height="280"></canvas>
                         </div>
-                        <div class="stat-chart-stats">
-                            <div class="chart-stat-item">
-                                <div class="chart-stat-label">Сегодня</div>
-                                <div class="chart-stat-value" id="todayReads">0</div>
-                                <div class="chart-stat-subtext">reads</div>
+                    </div>
+                    
+                    <!-- Daily Chart (7 days) -->
+                    <div class="stat-chart-card">
+                        <div class="stat-chart-header">
+                            <h2 class="stat-chart-title">Последние 7 дней</h2>
+                            <div class="stat-chart-legend">
+                                <div class="chart-legend-item">
+                                    <span class="chart-legend-color" style="background: #007AFF;"></span>
+                                    <span>Reads</span>
+                                </div>
+                                <div class="chart-legend-item">
+                                    <span class="chart-legend-color" style="background: #34C759;"></span>
+                                    <span>Writes</span>
+                                </div>
+                                <div class="chart-legend-item">
+                                    <span class="chart-legend-color" style="background: #FF3B30;"></span>
+                                    <span>Deletes</span>
+                                </div>
                             </div>
-                            <div class="chart-stat-item">
-                                <div class="chart-stat-label">Сегодня</div>
-                                <div class="chart-stat-value" id="todayWrites">0</div>
-                                <div class="chart-stat-subtext">writes</div>
-                            </div>
-                            <div class="chart-stat-item">
-                                <div class="chart-stat-label">7 дней</div>
-                                <div class="chart-stat-value" id="totalReads">0</div>
-                                <div class="chart-stat-subtext">reads</div>
-                            </div>
+                        </div>
+                        <div class="stat-chart-container">
+                            <canvas id="dailyChart" width="600" height="280"></canvas>
                         </div>
                     </div>
                 </div>
