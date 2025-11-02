@@ -41,6 +41,7 @@ const state = {
     currentCollection: null,
     documents: [],
     lastVisible: null,
+    pageMarkers: [null], // Store page markers for backward navigation: [null, doc1, doc2, ...]
     currentPage: 1,
     pageSize: 20,
     totalPages: 0,
@@ -711,6 +712,7 @@ const KNOWN_COLLECTIONS = [
 ];
 
 // Get collection stats
+// Optimized: only check if collection exists, don't count all documents
 async function getCollectionStats(collectionName) {
     try {
         if (!db) {
@@ -725,27 +727,19 @@ async function getCollectionStats(collectionName) {
         
         const colRef = collection(db, collectionName);
         
-        // Try to get first document to check if collection exists
+        // Only check if collection exists by trying to get first document
+        // This uses only 1 read per collection instead of up to 1000
         const firstDocSnapshot = await getDocs(query(colRef, limit(1)));
         
-        // Only get count if collection exists and has documents
-        let totalCount = 0;
-        if (!firstDocSnapshot.empty) {
-            // Get approximate count - but limit to avoid long waits
-            // Use getDocs with limit to get an estimate
-            const countSnapshot = await getDocs(query(colRef, limit(1000)));
-            totalCount = countSnapshot.size;
-            
-            // If we got 1000, there might be more
-            if (totalCount === 1000) {
-                totalCount = '1000+';
-            }
-        }
+        // If collection exists, we show "Есть документы" without exact count
+        // This saves thousands of reads
+        const hasDocuments = !firstDocSnapshot.empty;
         
         return {
             name: collectionName,
-            count: totalCount,
+            count: hasDocuments ? '?' : 0, // Show "?" if exists, exact count not needed for list
             exists: true,
+            hasDocuments: hasDocuments,
             error: null
         };
     } catch (error) {
@@ -875,19 +869,16 @@ function updateStatistics() {
     if (!state.collections || state.collections.length === 0) return;
     
     const total = state.collections.length;
-    const active = state.collections.filter(c => c.exists && !c.error && (typeof c.count === 'number' ? c.count > 0 : true)).length;
+    const active = state.collections.filter(c => c.exists && !c.error && c.hasDocuments).length;
     const restricted = state.collections.filter(c => c.error === 'permission-denied').length;
     
-    let totalDocs = 0;
-    state.collections.forEach(c => {
-        if (c.exists && !c.error && typeof c.count === 'number') {
-            totalDocs += c.count;
-        }
-    });
+    // Don't calculate total docs - it would require loading all documents
+    // This saves thousands of reads
+    const totalDocsText = active > 0 ? '?' : '0';
     
     if (elements.totalCollections) elements.totalCollections.textContent = total;
     if (elements.activeCollections) elements.activeCollections.textContent = active;
-    if (elements.totalDocuments) elements.totalDocuments.textContent = totalDocs.toLocaleString('ru-RU');
+    if (elements.totalDocuments) elements.totalDocuments.textContent = totalDocsText;
     if (elements.restrictedCollections) elements.restrictedCollections.textContent = restricted;
 }
 
@@ -910,9 +901,9 @@ function renderCollections(filter = 'all', searchTerm = '') {
     
     // Apply filter
     if (filter === 'active') {
-        filtered = filtered.filter(c => c.exists && !c.error && (typeof c.count === 'number' ? c.count > 0 : true));
+        filtered = filtered.filter(c => c.exists && !c.error && c.hasDocuments);
     } else if (filter === 'empty') {
-        filtered = filtered.filter(c => !c.exists || (c.exists && !c.error && (typeof c.count === 'number' ? c.count === 0 : false)));
+        filtered = filtered.filter(c => !c.exists || (c.exists && !c.error && !c.hasDocuments));
     } else if (filter === 'restricted') {
         filtered = filtered.filter(c => c.error === 'permission-denied');
     }
@@ -946,15 +937,16 @@ function createCollectionListItem(collectionInfo) {
     item.setAttribute('data-collection-name', collectionInfo.name.toLowerCase());
     
     const icon = getCollectionIcon(collectionInfo.name);
-    const count = typeof collectionInfo.count === 'number' ? collectionInfo.count : collectionInfo.count || 0;
-    const countText = typeof count === 'number' ? count.toLocaleString('ru-RU') : count;
     
     let statusText = '';
+    let countText = '';
     if (collectionInfo.error === 'permission-denied') {
         statusText = 'Нет доступа';
     } else if (!collectionInfo.exists) {
         statusText = 'Не найдена';
-    } else if (count === 0) {
+    } else if (collectionInfo.hasDocuments) {
+        countText = 'Есть документы';
+    } else {
         statusText = 'Пустая';
     }
     
@@ -965,9 +957,7 @@ function createCollectionListItem(collectionInfo) {
         <div class="collection-list-item-content">
             <div class="collection-list-item-name">${collectionInfo.name}</div>
             <div class="collection-list-item-meta">
-                ${collectionInfo.exists && !collectionInfo.error ? `
-                    <span>${countText} документов</span>
-                ` : ''}
+                ${countText ? `<span>${countText}</span>` : ''}
                 ${statusText ? `<span style="color: var(--apple-text-secondary);">${statusText}</span>` : ''}
             </div>
         </div>
@@ -1095,6 +1085,7 @@ function selectCollection(collectionName) {
     state.currentCollection = collectionName;
     state.currentPage = 1;
     state.lastVisible = null;
+    state.pageMarkers = [null]; // Reset page markers when selecting new collection
     state.totalPages = 0;
     
     // Update collection name display
@@ -1154,11 +1145,17 @@ async function loadCollection() {
         
         const colRef = collection(db, state.currentCollection);
         
-        // Build query
-        let q = query(colRef, orderBy('__name__'), limit(state.pageSize));
+        // Build query using cursor-based pagination
+        // pageMarkers[page] stores the document cursor for that page
+        let q;
+        const pageMarker = state.pageMarkers[state.currentPage - 1];
         
-        if (state.lastVisible) {
-            q = query(colRef, orderBy('__name__'), startAfter(state.lastVisible), limit(state.pageSize));
+        if (pageMarker === null || state.currentPage === 1) {
+            // First page: start from beginning
+            q = query(colRef, orderBy('__name__'), limit(state.pageSize));
+        } else {
+            // Other pages: use stored page marker
+            q = query(colRef, orderBy('__name__'), startAfter(pageMarker), limit(state.pageSize));
         }
         
         // Execute query
@@ -1172,17 +1169,30 @@ async function loadCollection() {
             });
         });
         
-        // Update lastVisible for pagination
+        // Update lastVisible and page markers for pagination
         if (snapshot.docs.length > 0) {
-            state.lastVisible = snapshot.docs[snapshot.docs.length - 1];
+            const newLastVisible = snapshot.docs[snapshot.docs.length - 1];
+            state.lastVisible = newLastVisible;
+            
+            // Store page marker for NEXT page (not current)
+            // pageMarkers[0] = null (page 1 start), pageMarkers[1] = marker for page 2 start, etc.
+            // We need marker for (currentPage + 1) - the start of next page
+            const nextPageIndex = state.currentPage; // Index for next page
+            if (!state.pageMarkers[nextPageIndex]) {
+                state.pageMarkers[nextPageIndex] = newLastVisible;
+            }
         }
         
-        // Get total count (approximate)
-        const totalSnapshot = await getDocs(query(colRef));
-        const totalCount = totalSnapshot.size;
+        // CRITICAL FIX: Don't load ALL documents just to count them!
+        // This was consuming thousands of reads
+        // Instead, show approximate count based on pagination
+        // If we got a full page, there are likely more documents
+        const hasMoreDocs = snapshot.docs.length === state.pageSize;
+        const estimatedCount = hasMoreDocs ? `${state.currentPage * state.pageSize}+` : (state.currentPage - 1) * state.pageSize + snapshot.docs.length;
         
-        // Calculate total pages
-        const totalPages = Math.ceil(totalCount / state.pageSize);
+        // Calculate total pages - use estimate
+        // We can't know exact pages without loading all docs, so we estimate
+        const totalPages = hasMoreDocs ? state.currentPage + 1 : state.currentPage;
         state.totalPages = totalPages;
         
         // Update UI
@@ -1190,14 +1200,14 @@ async function loadCollection() {
             elements.currentCollectionName.textContent = state.currentCollection;
         }
         if (elements.totalDocs) {
-            elements.totalDocs.textContent = totalCount;
+            elements.totalDocs.textContent = estimatedCount;
         }
         if (elements.shownDocs) {
             elements.shownDocs.textContent = state.documents.length;
         }
         
         renderDocuments();
-        updatePaginationButtons(totalPages);
+        updatePaginationButtons(totalPages, hasMoreDocs);
         hideLoading();
         
     } catch (error) {
@@ -1435,8 +1445,8 @@ if (elements.prevPageBtn) {
     elements.prevPageBtn.addEventListener('click', async () => {
         if (state.currentPage > 1) {
             state.currentPage--;
-            // Note: For proper pagination, you'd need to store previous page markers
-            // This is a simplified version
+            // Use stored page marker for backward navigation
+            // pageMarkers[currentPage - 1] gives us the cursor for the previous page
             await loadCollection();
         }
     });
@@ -1444,12 +1454,19 @@ if (elements.prevPageBtn) {
 
 if (elements.nextPageBtn) {
     elements.nextPageBtn.addEventListener('click', async () => {
-        state.currentPage++;
-        await loadCollection();
+        // Only go to next page if we got a full page (likely more docs)
+        if (state.documents.length === state.pageSize) {
+            state.currentPage++;
+            // Ensure page marker exists for new page
+            if (!state.pageMarkers[state.currentPage - 1]) {
+                state.pageMarkers[state.currentPage - 1] = state.lastVisible;
+            }
+            await loadCollection();
+        }
     });
 }
 
-function updatePaginationButtons(totalPages = 0) {
+function updatePaginationButtons(totalPages = 0, hasMoreDocs = false) {
     if (!elements.pageInfo || !elements.prevPageBtn || !elements.nextPageBtn) {
         logger.warn('Pagination elements not found');
         return;
@@ -1460,19 +1477,16 @@ function updatePaginationButtons(totalPages = 0) {
         totalPages = state.totalPages;
     }
     
-    // Calculate total pages if still not available
-    if (totalPages === 0 && elements.totalDocs) {
-        const totalCount = parseInt(elements.totalDocs.textContent) || 0;
-        totalPages = Math.ceil(totalCount / state.pageSize);
-        state.totalPages = totalPages;
-    }
+    // Don't try to calculate from estimated count - it's not a number
+    // Total pages is estimated based on whether we got full page
     
     elements.prevPageBtn.disabled = state.currentPage === 1;
-    elements.nextPageBtn.disabled = state.currentPage >= totalPages || totalPages === 0;
+    // Enable next button if we got a full page (likely more docs)
+    elements.nextPageBtn.disabled = !hasMoreDocs;
     
     // Update page info text
     if (totalPages > 0) {
-        elements.pageInfo.textContent = `Страница ${state.currentPage} из ${totalPages}`;
+        elements.pageInfo.textContent = `Страница ${state.currentPage}${totalPages > state.currentPage ? ` из ${totalPages}+` : ''}`;
     } else {
         elements.pageInfo.textContent = `Страница ${state.currentPage}`;
     }
@@ -1594,6 +1608,7 @@ function resetState() {
     state.currentCollection = null;
     state.documents = [];
     state.lastVisible = null;
+    state.pageMarkers = [null];
     state.currentPage = 1;
     state.totalPages = 0;
     state.editingDocId = null;
