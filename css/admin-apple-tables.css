@@ -36,6 +36,47 @@
     color: var(--apple-text-primary);
 }
 
+/* Explicit dark theme support for documents table */
+[data-theme="dark"] .documents-table {
+    background: var(--apple-bg-secondary);
+    border-color: var(--apple-separator);
+}
+
+[data-theme="dark"] .documents-table thead {
+    background: var(--apple-bg-tertiary);
+}
+
+[data-theme="dark"] .documents-table th {
+    color: var(--apple-text-secondary);
+    border-bottom-color: var(--apple-separator);
+}
+
+[data-theme="dark"] .documents-table td {
+    color: var(--apple-text-primary);
+    border-bottom-color: var(--apple-separator);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .documents-table {
+        background: var(--apple-bg-secondary);
+        border-color: var(--apple-separator);
+    }
+    
+    :root:not([data-theme="light"]) .documents-table thead {
+        background: var(--apple-bg-tertiary);
+    }
+    
+    :root:not([data-theme="light"]) .documents-table th {
+        color: var(--apple-text-secondary);
+        border-bottom-color: var(--apple-separator);
+    }
+    
+    :root:not([data-theme="light"]) .documents-table td {
+        color: var(--apple-text-primary);
+        border-bottom-color: var(--apple-separator);
+    }
+}
+
 .documents-table tbody tr:last-child td {
     border-bottom: none;
 }
@@ -76,6 +117,21 @@
     white-space: pre-wrap;
     color: var(--apple-text-primary);
     border: 0.5px solid var(--apple-separator);
+}
+
+/* Dark theme support */
+[data-theme="dark"] .doc-data pre {
+    background: var(--apple-bg-tertiary);
+    color: var(--apple-text-primary);
+    border-color: var(--apple-separator);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .doc-data pre {
+        background: var(--apple-bg-tertiary);
+        color: var(--apple-text-primary);
+        border-color: var(--apple-separator);
+    }
 }
 
 .doc-data pre.expanded {

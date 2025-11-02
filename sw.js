@@ -5,14 +5,11 @@
 const CACHE_VERSION = 'v1.0.0';
 const CACHE_NAME = `zerikc-portfolio-${CACHE_VERSION}`;
 
-// Проверка development режима (Service Worker работает изолированно)
-// Используем глобальный флаг из main thread или проверяем по origin
 const isDevelopment = self.registration?.scope?.includes('localhost') || 
                       self.registration?.scope?.includes('127.0.0.1') ||
                       self.location?.hostname === 'localhost' ||
                       self.location?.hostname === '127.0.0.1';
 
-// Простой logger для Service Worker
 const swLogger = {
     log: (...args) => {
         if (isDevelopment) {
@@ -20,7 +17,6 @@ const swLogger = {
         }
     },
     error: (...args) => {
-        // Ошибки всегда логируем
         console.error(...args);
     },
     warn: (...args) => {

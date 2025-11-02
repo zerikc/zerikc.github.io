@@ -22,6 +22,7 @@
     /* Dark Mode Colors */
     --apple-bg-primary-dark: #1C1C1E;
     --apple-bg-secondary-dark: #000000;
+    --apple-bg-tertiary-dark: #2C2C2E;
     --apple-bg-sidebar-dark: rgba(28, 28, 30, 0.8);
     --apple-bg-toolbar-dark: rgba(0, 0, 0, 0.8);
     
@@ -52,6 +53,7 @@
 [data-theme="dark"] {
     --apple-bg-primary: var(--apple-bg-primary-dark);
     --apple-bg-secondary: var(--apple-bg-secondary-dark);
+    --apple-bg-tertiary: var(--apple-bg-tertiary-dark);
     --apple-bg-sidebar: var(--apple-bg-sidebar-dark);
     --apple-bg-toolbar: var(--apple-bg-toolbar-dark);
     --apple-text-primary: var(--apple-text-primary-dark);
@@ -63,6 +65,7 @@
     :root:not([data-theme="light"]) {
         --apple-bg-primary: var(--apple-bg-primary-dark);
         --apple-bg-secondary: var(--apple-bg-secondary-dark);
+        --apple-bg-tertiary: var(--apple-bg-tertiary-dark);
         --apple-bg-sidebar: var(--apple-bg-sidebar-dark);
         --apple-bg-toolbar: var(--apple-bg-toolbar-dark);
         --apple-text-primary: var(--apple-text-primary-dark);

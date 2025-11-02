@@ -11,31 +11,25 @@
     
     let currentActiveApp = null;
     
-    // Global function for showing app details
     window.showAppDetail = function(appId) {
         const detailSection = document.querySelector('.app-detail-section');
         
-        // Remove active class from all mini cards
         document.querySelectorAll('.app-mini-card').forEach(card => {
             card.classList.remove('active');
         });
         
-        // Hide all detail cards
         document.querySelectorAll('.app-detail-card').forEach(card => {
             card.classList.remove('active');
         });
         
-        // If clicking the same app, close it
         if (currentActiveApp === appId) {
             currentActiveApp = null;
-            // Hide the detail section if no app is selected
             if (detailSection) {
                 detailSection.classList.add('hidden');
             }
             return;
         }
         
-        // Show selected app
         const miniCard = document.querySelector(`[data-app="${appId}"]`);
         const detailCard = document.getElementById(`detail-${appId}`);
         
@@ -44,12 +38,10 @@
             detailCard.classList.add('active');
             currentActiveApp = appId;
             
-            // Show the detail section
-            if (detailSection) {
-                detailSection.classList.remove('hidden');
-                
-                // Smooth scroll to detail section
-                setTimeout(() => {
+                if (detailSection) {
+                    detailSection.classList.remove('hidden');
+                    
+                    setTimeout(() => {
                     const navbarHeight = document.getElementById('navbar').offsetHeight;
                     const targetPosition = detailSection.getBoundingClientRect().top + window.pageYOffset - navbarHeight - 20;
                     
@@ -537,12 +529,6 @@
     }
     
     // ================================
-    // App Card Hover Effects
-    // ================================
-    
-    // Simple hover effect - handled by CSS
-    
-    // ================================
     // Scroll Progress Bar
     // ================================
     
@@ -558,10 +544,8 @@
         }
     }
     
-    // Moved to optimized scroll handler below
-    
     // ================================
-    // Section References (shared)
+    // Section References
     // ================================
     
     const sections = document.querySelectorAll('section[id]');
@@ -597,8 +581,6 @@
             });
         });
     }
-    
-    // Parallax on scroll - moved to optimized scroll handler below
     
     // ================================
     // Active Navigation Link Highlighting

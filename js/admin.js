@@ -51,28 +51,23 @@ const state = {
     isInitialLoad: true // Флаг первой загрузки - всегда показывать экран входа
 };
 
-// Get Firebase instances - with fallback check
 let db = null;
 
-// Check for Firebase initialization
 function checkFirebaseInit() {
-        if (window.firebaseDb) {
-            db = window.firebaseDb;
-        } else {
-            logger.warn('Firebase Db not yet initialized');
-        }
-    
+    if (window.firebaseDb) {
+        db = window.firebaseDb;
+    } else {
+        logger.warn('Firebase Db not yet initialized');
+    }
     return db;
 }
 
-// Initial check
 checkFirebaseInit();
 
 // ================================
 // DOM Elements
 // ================================
 
-// Use window.document to avoid conflicts with variable names
 const getElement = (id) => window.document.getElementById(id);
 
 const elements = {
@@ -172,12 +167,10 @@ async function handleGoogleSignIn() {
         elements.googleSignInBtn.textContent = 'Вход...';
         elements.loginError.textContent = '';
         
-        // Проверяем, загружена ли библиотека Google Identity Services
         if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
             throw new Error('Библиотека Google Identity Services не загружена. Пожалуйста, обновите страницу.');
         }
         
-        // Используем Google Identity Services
         const tokenClient = google.accounts.oauth2.initTokenClient({
             client_id: window.CONFIG?.OAUTH?.CLIENT_ID || '974852900993-neldo0t6ldgo1qfpo51tfdkla9a0pvps.apps.googleusercontent.com',
             scope: 'https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
@@ -190,11 +183,9 @@ async function handleGoogleSignIn() {
                     return;
                 }
                 
-                // Сохраняем токен
                 window.googleAuthToken = tokenResponse.access_token;
                 localStorage.setItem('googleAuthToken', tokenResponse.access_token);
                 
-                // Получаем информацию о пользователе
                 try {
                     const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
                         headers: {
@@ -218,11 +209,7 @@ async function handleGoogleSignIn() {
                     };
                     
                     showToast('Вход выполнен успешно', 'success');
-                    
-                    // Снимаем флаг первой загрузки - пользователь явно вошел
                     state.isInitialLoad = false;
-                    
-                    // После успешной авторизации проверяем проекты
                     checkProjectsAndShowScreen();
                     
                 } catch (error) {
@@ -234,7 +221,6 @@ async function handleGoogleSignIn() {
             }
         });
         
-        // Запускаем процесс авторизации
         tokenClient.requestAccessToken({ prompt: 'consent' });
         
     } catch (error) {
@@ -711,7 +697,6 @@ const KNOWN_COLLECTIONS = [
     'help_sections'
 ];
 
-// Get collection stats
 // Optimized: only check if collection exists, don't count all documents
 async function getCollectionStats(collectionName) {
     try {
@@ -726,18 +711,12 @@ async function getCollectionStats(collectionName) {
         }
         
         const colRef = collection(db, collectionName);
-        
-        // Only check if collection exists by trying to get first document
-        // This uses only 1 read per collection instead of up to 1000
         const firstDocSnapshot = await getDocs(query(colRef, limit(1)));
-        
-        // If collection exists, we show "Есть документы" without exact count
-        // This saves thousands of reads
         const hasDocuments = !firstDocSnapshot.empty;
         
         return {
             name: collectionName,
-            count: hasDocuments ? '?' : 0, // Show "?" if exists, exact count not needed for list
+            count: hasDocuments ? '?' : 0,
             exists: true,
             hasDocuments: hasDocuments,
             error: null
@@ -1169,33 +1148,22 @@ async function loadCollection() {
             });
         });
         
-        // Update lastVisible and page markers for pagination
         if (snapshot.docs.length > 0) {
             const newLastVisible = snapshot.docs[snapshot.docs.length - 1];
             state.lastVisible = newLastVisible;
             
-            // Store page marker for NEXT page (not current)
-            // pageMarkers[0] = null (page 1 start), pageMarkers[1] = marker for page 2 start, etc.
-            // We need marker for (currentPage + 1) - the start of next page
-            const nextPageIndex = state.currentPage; // Index for next page
+            const nextPageIndex = state.currentPage;
             if (!state.pageMarkers[nextPageIndex]) {
                 state.pageMarkers[nextPageIndex] = newLastVisible;
             }
         }
         
-        // CRITICAL FIX: Don't load ALL documents just to count them!
-        // This was consuming thousands of reads
-        // Instead, show approximate count based on pagination
-        // If we got a full page, there are likely more documents
+        // Estimate count based on pagination (avoid loading all documents)
         const hasMoreDocs = snapshot.docs.length === state.pageSize;
         const estimatedCount = hasMoreDocs ? `${state.currentPage * state.pageSize}+` : (state.currentPage - 1) * state.pageSize + snapshot.docs.length;
         
-        // Calculate total pages - use estimate
-        // We can't know exact pages without loading all docs, so we estimate
         const totalPages = hasMoreDocs ? state.currentPage + 1 : state.currentPage;
         state.totalPages = totalPages;
-        
-        // Update UI
         if (elements.currentCollectionName) {
             elements.currentCollectionName.textContent = state.currentCollection;
         }
@@ -1445,8 +1413,6 @@ if (elements.prevPageBtn) {
     elements.prevPageBtn.addEventListener('click', async () => {
         if (state.currentPage > 1) {
             state.currentPage--;
-            // Use stored page marker for backward navigation
-            // pageMarkers[currentPage - 1] gives us the cursor for the previous page
             await loadCollection();
         }
     });
@@ -1454,10 +1420,8 @@ if (elements.prevPageBtn) {
 
 if (elements.nextPageBtn) {
     elements.nextPageBtn.addEventListener('click', async () => {
-        // Only go to next page if we got a full page (likely more docs)
         if (state.documents.length === state.pageSize) {
             state.currentPage++;
-            // Ensure page marker exists for new page
             if (!state.pageMarkers[state.currentPage - 1]) {
                 state.pageMarkers[state.currentPage - 1] = state.lastVisible;
             }
@@ -1472,19 +1436,14 @@ function updatePaginationButtons(totalPages = 0, hasMoreDocs = false) {
         return;
     }
     
-    // Use state.totalPages if not provided
     if (totalPages === 0) {
         totalPages = state.totalPages;
     }
-    
-    // Don't try to calculate from estimated count - it's not a number
-    // Total pages is estimated based on whether we got full page
     
     elements.prevPageBtn.disabled = state.currentPage === 1;
     // Enable next button if we got a full page (likely more docs)
     elements.nextPageBtn.disabled = !hasMoreDocs;
     
-    // Update page info text
     if (totalPages > 0) {
         elements.pageInfo.textContent = `Страница ${state.currentPage}${totalPages > state.currentPage ? ` из ${totalPages}+` : ''}`;
     } else {
