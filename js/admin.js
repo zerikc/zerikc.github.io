@@ -22,6 +22,16 @@ import {
 import { projectManager, ProjectManager } from './project-manager.js';
 
 // ================================
+// Logger utility (loaded from logger.js)
+// ================================
+
+const logger = window.logger || {
+    log: () => {},
+    error: (...args) => console.error(...args),
+    warn: (...args) => { if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') console.warn(...args); }
+};
+
+// ================================
 // Global State
 // ================================
 
@@ -45,11 +55,11 @@ let db = null;
 
 // Check for Firebase initialization
 function checkFirebaseInit() {
-    if (window.firebaseDb) {
-        db = window.firebaseDb;
-    } else {
-        console.warn('Firebase Db not yet initialized');
-    }
+        if (window.firebaseDb) {
+            db = window.firebaseDb;
+        } else {
+            logger.warn('Firebase Db not yet initialized');
+        }
     
     return db;
 }
@@ -168,11 +178,11 @@ async function handleGoogleSignIn() {
         
         // Используем Google Identity Services
         const tokenClient = google.accounts.oauth2.initTokenClient({
-            client_id: '974852900993-neldo0t6ldgo1qfpo51tfdkla9a0pvps.apps.googleusercontent.com', // Client ID для Google OAuth
+            client_id: window.CONFIG?.OAUTH?.CLIENT_ID || '974852900993-neldo0t6ldgo1qfpo51tfdkla9a0pvps.apps.googleusercontent.com',
             scope: 'https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
             callback: async (tokenResponse) => {
                 if (tokenResponse.error) {
-                    console.error('OAuth error:', tokenResponse.error);
+                    logger.error('OAuth error:', tokenResponse.error);
                     showError(elements.loginError, 'Ошибка авторизации: ' + tokenResponse.error);
                     elements.googleSignInBtn.disabled = false;
                     elements.googleSignInBtn.textContent = 'Войти через Google';
@@ -193,12 +203,12 @@ async function handleGoogleSignIn() {
                     
                     if (!response.ok) {
                         const errorText = await response.text();
-                        console.error('Userinfo error:', response.status, errorText);
+                        logger.error('Userinfo error:', response.status, errorText);
                         throw new Error(`Failed to fetch user info: ${response.status}`);
                     }
                     
                     const userInfo = await response.json();
-                    console.log('User info received:', userInfo);
+                    logger.log('User info received:', userInfo);
                     
                     state.currentUser = {
                         email: userInfo.email,
@@ -215,7 +225,7 @@ async function handleGoogleSignIn() {
                     checkProjectsAndShowScreen();
                     
                 } catch (error) {
-                    console.error('Error fetching user info:', error);
+                    logger.error('Error fetching user info:', error);
                     showError(elements.loginError, 'Ошибка получения данных пользователя');
                     elements.googleSignInBtn.disabled = false;
                     elements.googleSignInBtn.textContent = 'Войти через Google';
@@ -227,7 +237,7 @@ async function handleGoogleSignIn() {
         tokenClient.requestAccessToken({ prompt: 'consent' });
         
     } catch (error) {
-        console.error('Google Sign-In error:', error);
+        logger.error('Google Sign-In error:', error);
         showError(elements.loginError, getErrorMessage(error));
         elements.googleSignInBtn.disabled = false;
         elements.googleSignInBtn.textContent = 'Войти через Google';
@@ -286,14 +296,14 @@ async function initializeFirebaseForProject(project) {
         setTimeout(async () => {
             checkFirebaseInit();
             if (db) {
-                console.log('Loading collections after project switch...');
+                logger.log('Loading collections after project switch...');
                 await loadAllCollections();
                 // Статистика обновится автоматически в loadAllCollections() через updateStatistics()
             }
         }, 300);
         
     } catch (error) {
-        console.error('Error initializing Firebase:', error);
+        logger.error('Error initializing Firebase:', error);
         showToast('Ошибка подключения к проекту: ' + error.message, 'error');
         showProjectSelectionScreen();
     }
@@ -350,7 +360,7 @@ async function showProjectSelectionScreen() {
 // Загрузить и показать Firebase проекты пользователя
 async function loadAndShowUserProjects() {
     if (!window.googleAuthToken) {
-        console.log('No Google auth token, skipping project load');
+        logger.log('No Google auth token, skipping project load');
         renderProjectsList();
         return;
     }
@@ -358,19 +368,19 @@ async function loadAndShowUserProjects() {
     try {
         showLoading();
         
-        console.log('Loading projects from Google Cloud...');
+        logger.log('Loading projects from Google Cloud...');
         
         // Получаем все проекты
         const allProjects = await ProjectManager.fetchUserProjects(window.googleAuthToken);
-        console.log('All projects received:', allProjects);
+        logger.log('All projects received:', allProjects);
         
         // Фильтруем только Firebase проекты
         const firebaseProjects = [];
         for (const project of allProjects) {
-            console.log('Checking if project is Firebase:', project.projectId);
+            logger.log('Checking if project is Firebase:', project.projectId);
             const isFirebase = await ProjectManager.isFirebaseProject(project.projectId, window.googleAuthToken);
             if (isFirebase) {
-                console.log('Project is Firebase:', project.projectId);
+                logger.log('Project is Firebase:', project.projectId);
                 firebaseProjects.push(project);
                 
                 // Автоматически добавляем в projectManager, если еще нет
@@ -382,7 +392,7 @@ async function loadAndShowUserProjects() {
             }
         }
         
-        console.log('Firebase projects found:', firebaseProjects);
+        logger.log('Firebase projects found:', firebaseProjects);
         
         hideLoading();
         
@@ -390,7 +400,7 @@ async function loadAndShowUserProjects() {
         renderProjectsList();
         
     } catch (error) {
-        console.error('Error loading projects:', error);
+        logger.error('Error loading projects:', error);
         hideLoading();
         
         // Показываем только локально сохраненные проекты
@@ -604,10 +614,10 @@ function attachRefreshButtonListener() {
         elements.refreshCollectionsBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             e.stopPropagation();
-            console.log('Refresh button clicked');
+            logger.log('Refresh button clicked');
             
             if (state.collectionsLoading) {
-                console.log('Already loading...');
+                logger.log('Already loading...');
                 showToast('Коллекции уже загружаются...', 'info');
                 return;
             }
@@ -616,9 +626,9 @@ function attachRefreshButtonListener() {
             await loadAllCollections();
             showToast('Коллекции обновлены', 'success');
         });
-        console.log('Refresh button listener attached');
+        logger.log('Refresh button listener attached');
     } else {
-        console.error('refreshCollectionsBtn not found');
+        logger.error('refreshCollectionsBtn not found');
     }
 }
 
@@ -704,7 +714,7 @@ const KNOWN_COLLECTIONS = [
 async function getCollectionStats(collectionName) {
     try {
         if (!db) {
-            console.error('Firebase db not initialized');
+            logger.error('Firebase db not initialized');
             return {
                 name: collectionName,
                 count: 0,
@@ -768,18 +778,18 @@ async function getCollectionStats(collectionName) {
 // Get all collections stats
 async function loadAllCollections() {
     if (!elements.collectionsList) {
-        console.error('collectionsList not found');
+        logger.error('collectionsList not found');
         return;
     }
     
     if (state.collectionsLoading) {
-        console.log('Collections already loading');
+        logger.log('Collections already loading');
         return;
     }
     
     // Check if Firebase is initialized
     if (!db) {
-        console.error('Firebase db is not initialized');
+        logger.error('Firebase db is not initialized');
         showToast('Ошибка: Firebase не инициализирован. Проверьте консоль браузера.', 'error');
         return;
     }
@@ -796,7 +806,7 @@ async function loadAllCollections() {
     }
     
     try {
-        console.log('Loading collections...');
+        logger.log('Loading collections...');
         
         // Load collections sequentially with progress to avoid overwhelming Firebase
         state.collections = [];
@@ -811,7 +821,7 @@ async function loadAllCollections() {
                 // Update UI progress
                 if (i === 0 || (i + 1) % 5 === 0 || i === totalCollections - 1) {
                     const progress = Math.round(((i + 1) / totalCollections) * 100);
-                    console.log(`Progress: ${progress}% (${i + 1}/${totalCollections})`);
+                    logger.log(`Progress: ${progress}% (${i + 1}/${totalCollections})`);
                 }
             } catch (error) {
                 state.collections.push({
@@ -835,13 +845,13 @@ async function loadAllCollections() {
             return a.name.localeCompare(b.name);
         });
         
-        console.log('Collections loaded:', state.collections.length);
+        logger.log('Collections loaded:', state.collections.length);
         updateStatistics();
         renderCollections();
         
     } catch (error) {
         showToast('Ошибка загрузки коллекций: ' + getErrorMessage(error), 'error');
-        console.error('Error loading collections:', error);
+        logger.error('Error loading collections:', error);
     } finally {
         state.collectionsLoading = false;
     }
@@ -1070,7 +1080,7 @@ function showView(viewName) {
 
 function selectCollection(collectionName) {
     if (!db) {
-        console.error('Firebase db not initialized');
+        logger.error('Firebase db not initialized');
         showToast('Ошибка: Firebase не инициализирован. Подождите...', 'error');
         checkFirebaseInit();
         // Retry after a moment
@@ -1133,7 +1143,7 @@ async function loadCollection() {
     
     // Check if db is initialized
     if (!db) {
-        console.error('Firebase db not initialized');
+        logger.error('Firebase db not initialized');
         showToast('Ошибка: Firebase не инициализирован', 'error');
         hideLoading();
         return;
@@ -1193,7 +1203,7 @@ async function loadCollection() {
     } catch (error) {
         hideLoading();
         showToast(getErrorMessage(error), 'error');
-        console.error('Error loading collection:', error);
+        logger.error('Error loading collection:', error);
     }
 }
 
@@ -1441,7 +1451,7 @@ if (elements.nextPageBtn) {
 
 function updatePaginationButtons(totalPages = 0) {
     if (!elements.pageInfo || !elements.prevPageBtn || !elements.nextPageBtn) {
-        console.warn('Pagination elements not found');
+        logger.warn('Pagination elements not found');
         return;
     }
     
@@ -1559,7 +1569,7 @@ function showAdminPanel() {
             if (db) {
                 loadAllCollections();
             } else {
-                console.warn('Waiting for db initialization...');
+                logger.warn('Waiting for db initialization...');
                 setTimeout(() => {
                     checkFirebaseInit();
                     if (db) {

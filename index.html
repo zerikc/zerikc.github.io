@@ -12,6 +12,17 @@
     <meta property="og:description" content="Портфолио iOS разработчика. Приложения для умного дома, женского здоровья, отслеживания менструального цикла и управления задачами." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://zerikc.github.io" />
+    <meta property="og:image" content="https://zerikc.github.io/images/icon-512.png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:site_name" content="Zerikc Apps" />
+    <meta property="og:locale" content="ru_RU" />
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Zerikc Apps - iOS Developer" />
+    <meta name="twitter:description" content="Портфолио iOS разработчика. Приложения для умного дома, женского здоровья, отслеживания менструального цикла и управления задачами." />
+    <meta name="twitter:image" content="https://zerikc.github.io/images/icon-512.png" />
     
     <!-- Icons -->
     <link rel="apple-touch-icon" href="images/apple-touch-icon.png" />
@@ -29,6 +40,57 @@
     
     <title>Zerikc Apps - iOS Developer</title>
     <link rel="stylesheet" href="css/styles.css" />
+    
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Владислав Сидельников",
+      "alternateName": "Zerikc",
+      "url": "https://zerikc.github.io",
+      "email": "zerikc@icloud.com",
+      "jobTitle": "iOS Developer",
+      "worksFor": {
+        "@type": "Organization",
+        "name": "Zerikc Apps"
+      },
+      "sameAs": [
+        "https://zerikc.github.io"
+      ],
+      "knowsAbout": [
+        "iOS Development",
+        "Swift",
+        "SwiftUI",
+        "SwiftData",
+        "HomeKit",
+        "Mobile App Development"
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Floralia",
+      "applicationCategory": "HealthApplication",
+      "operatingSystem": "iOS",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.5",
+        "ratingCount": "100"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Владислав Сидельников"
+      }
+    }
+    </script>
 </head>
 <body>
     <!-- Scroll Progress Bar -->
@@ -39,22 +101,22 @@
         <div class="container">
             <div class="nav-brand">
                 <span class="brand-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
                     </svg>
                 </span>
                 <span class="brand-name">Zerikc Apps</span>
             </div>
             <a href="admin.html" class="admin-toggle" aria-label="Админ-панель" title="Firebase Admin Panel">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
                 </svg>
             </a>
             <button class="theme-toggle" id="themeToggle" aria-label="Переключить тему">
-                <svg class="theme-icon sun-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <svg class="theme-icon sun-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
                 </svg>
-                <svg class="theme-icon moon-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <svg class="theme-icon moon-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
                 </svg>
             </button>
@@ -90,8 +152,8 @@
                     женского здоровья и повышения продуктивности
                 </p>
                 <div class="hero-buttons">
-                    <button id="installButton" class="btn btn-primary install-btn" style="display: none;">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <button id="installButton" class="btn btn-primary install-btn" style="display: none;" aria-label="Установить приложение на устройство">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
                         </svg>
                         Установить приложение
@@ -103,11 +165,11 @@
         </div>
         
         <!-- Scroll Down Chevron -->
-        <div class="scroll-chevron">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <div class="scroll-chevron" aria-label="Прокрутить вниз">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
             </svg>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
             </svg>
         </div>
@@ -136,14 +198,14 @@
                     <!-- Watch Weather Mini Card -->
                     <div class="app-mini-card" data-app="weather">
                         <div class="app-mini-icon">
-                            <img src="images/weather-icon.png" alt="Watch Weather" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                            <img src="images/weather-icon.png" alt="Watch Weather" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
                             <div class="app-icon-fallback" style="display: none;">⛅</div>
                         </div>
                         <h3 class="app-mini-title">Watch Weather</h3>
                         <p class="app-mini-tagline">Погода на вашем запястье</p>
                         <div class="app-mini-status">Скоро</div>
                         <div class="expand-arrow">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                             </svg>
                         </div>
@@ -152,14 +214,14 @@
                     <!-- Homie Mini Card -->
                     <div class="app-mini-card" data-app="homie">
                         <div class="app-mini-icon">
-                            <img src="images/homie-icon.png" alt="Homie" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                            <img src="images/homie-icon.png" alt="Homie" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
                             <div class="app-icon-fallback" style="display: none;">🏠</div>
                         </div>
                         <h3 class="app-mini-title">Homie</h3>
                         <p class="app-mini-tagline">Управление умным домом</p>
                         <div class="app-mini-status">Скоро</div>
                         <div class="expand-arrow">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                             </svg>
                         </div>
@@ -168,14 +230,14 @@
                     <!-- Floralia Mini Card -->
                     <div class="app-mini-card" data-app="floralia">
                         <div class="app-mini-icon">
-                            <img src="images/floralia-icon.png" alt="Floralia" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                            <img src="images/floralia-icon.png" alt="Floralia" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
                             <div class="app-icon-fallback" style="display: none;">🌸</div>
                         </div>
                         <h3 class="app-mini-title">Floralia</h3>
                         <p class="app-mini-tagline">Женский календарь здоровья</p>
                         <div class="app-mini-status">В App Store</div>
                         <div class="expand-arrow">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                             </svg>
                         </div>
@@ -184,14 +246,14 @@
                     <!-- CheckList Mini Card -->
                     <div class="app-mini-card" data-app="checklist">
                         <div class="app-mini-icon">
-                            <img src="images/checklist-icon.png" alt="CheckList" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                            <img src="images/checklist-icon.png" alt="CheckList" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
                             <div class="app-icon-fallback" style="display: none;">✓</div>
                         </div>
                         <h3 class="app-mini-title">CheckList</h3>
                         <p class="app-mini-tagline">Управление сменами с AI</p>
                         <div class="app-mini-status">Скоро</div>
                         <div class="expand-arrow">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                             </svg>
                         </div>
@@ -200,14 +262,14 @@
                     <!-- Shattered Realm Mini Card -->
                     <div class="app-mini-card" data-app="shattered-realm">
                         <div class="app-mini-icon">
-                            <img src="images/shattered-realm-icon.png" alt="Shattered Realm" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                            <img src="images/shattered-realm-icon.png" alt="Shattered Realm" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
                             <div class="app-icon-fallback" style="display: none;">⚔️</div>
                         </div>
                         <h3 class="app-mini-title">Shattered Realm</h3>
                         <p class="app-mini-tagline">Low-Poly 3D RPG</p>
                         <div class="app-mini-status">В разработке</div>
                         <div class="expand-arrow">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                             </svg>
                         </div>
@@ -220,7 +282,7 @@
                     <div class="app-detail-card" id="detail-weather">
                         <div class="app-detail-header">
                             <div class="app-detail-icon">
-                                <img src="images/weather-icon.png" alt="Watch Weather" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                                <img src="images/weather-icon.png" alt="Watch Weather" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
                                 <div class="app-icon-fallback" style="display: none;">⛅</div>
                             </div>
                             <div class="app-detail-info">
@@ -246,7 +308,7 @@
                         <div class="app-detail-stats">
                             <div class="stat">
                                 <span class="stat-value">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                 </span>
@@ -254,7 +316,7 @@
                             </div>
                             <div class="stat">
                                 <span class="stat-value">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" />
                                     </svg>
                                 </span>
@@ -272,7 +334,7 @@
                     <div class="app-detail-card" id="detail-homie">
                         <div class="app-detail-header">
                             <div class="app-detail-icon">
-                                <img src="images/homie-icon.png" alt="Homie" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                                <img src="images/homie-icon.png" alt="Homie" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
                                 <div class="app-icon-fallback" style="display: none;">🏠</div>
                             </div>
                             <div class="app-detail-info">
@@ -297,7 +359,7 @@
                         <div class="app-detail-stats">
                             <div class="stat">
                                 <span class="stat-value">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
                                     </svg>
                                 </span>
@@ -305,7 +367,7 @@
                             </div>
                             <div class="stat">
                                 <span class="stat-value">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 20.25h12m-7.5-3v3m3-3v3m-10.125-3h17.25c.621 0 1.125-.504 1.125-1.125V4.875c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125z" />
                                     </svg>
                                 </span>
@@ -323,7 +385,7 @@
                     <div class="app-detail-card" id="detail-floralia">
                         <div class="app-detail-header">
                             <div class="app-detail-icon">
-                                <img src="images/floralia-icon.png" alt="Floralia" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                                <img src="images/floralia-icon.png" alt="Floralia" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
                                 <div class="app-icon-fallback" style="display: none;">🌸</div>
                             </div>
                             <div class="app-detail-info">
@@ -349,7 +411,7 @@
                         <div class="app-detail-stats">
                             <div class="stat">
                                 <span class="stat-value">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
                                     </svg>
                                 </span>
@@ -357,7 +419,7 @@
                             </div>
                             <div class="stat">
                                 <span class="stat-value">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
                                     </svg>
                                 </span>
@@ -366,8 +428,8 @@
                         </div>
                         <div class="app-detail-links">
                             <a href="https://apps.apple.com/app/floralia/id6753785306" target="_blank" rel="noopener noreferrer" class="app-store-badge">
-                                <img src="images/app-store-badge-dark.svg" alt="Скачать в App Store" class="app-store-badge-dark">
-                                <img src="images/app-store-badge-light.svg" alt="Скачать в App Store" class="app-store-badge-light">
+                                <img src="images/app-store-badge-dark.svg" alt="Скачать в App Store" class="app-store-badge-dark" loading="lazy">
+                                <img src="images/app-store-badge-light.svg" alt="Скачать в App Store" class="app-store-badge-light" loading="lazy">
                             </a>
                         </div>
                     </div>
@@ -376,7 +438,7 @@
                     <div class="app-detail-card" id="detail-checklist">
                         <div class="app-detail-header">
                             <div class="app-detail-icon">
-                                <img src="images/checklist-icon.png" alt="CheckList" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                                <img src="images/checklist-icon.png" alt="CheckList" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
                                 <div class="app-icon-fallback" style="display: none;">✓</div>
                             </div>
                             <div class="app-detail-info">
@@ -401,7 +463,7 @@
                         <div class="app-detail-stats">
                             <div class="stat">
                                 <span class="stat-value">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
                                     </svg>
                                 </span>
@@ -409,7 +471,7 @@
                             </div>
                             <div class="stat">
                                 <span class="stat-value">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
                                     </svg>
                                 </span>
@@ -427,7 +489,7 @@
                     <div class="app-detail-card" id="detail-shattered-realm">
                         <div class="app-detail-header">
                             <div class="app-detail-icon">
-                                <img src="images/shattered-realm-icon.png" alt="Shattered Realm" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                                <img src="images/shattered-realm-icon.png" alt="Shattered Realm" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
                                 <div class="app-icon-fallback" style="display: none;">⚔️</div>
                             </div>
                             <div class="app-detail-info">
@@ -451,7 +513,7 @@
                         <div class="app-detail-stats">
                             <div class="stat">
                                 <span class="stat-value">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
                                     </svg>
                                 </span>
@@ -459,7 +521,7 @@
                             </div>
                             <div class="stat">
                                 <span class="stat-value">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A7.5 7.5 0 0118 12H6a7.5 7.5 0 00-1.499 8.118z" />
                                     </svg>
                                 </span>
@@ -490,7 +552,7 @@
             <div class="contact-cards">
                 <div class="contact-card">
                     <div class="contact-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                         </svg>
                     </div>
@@ -537,6 +599,54 @@
         </div>
     </footer>
 
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Владислав Сидельников",
+      "alternateName": "Zerikc",
+      "url": "https://zerikc.github.io",
+      "email": "zerikc@icloud.com",
+      "jobTitle": "iOS Developer",
+      "worksFor": {
+        "@type": "Organization",
+        "name": "Zerikc Apps"
+      },
+      "knowsAbout": [
+        "iOS Development",
+        "SwiftUI",
+        "SwiftData",
+        "HomeKit",
+        "Apple Watch Development",
+        "iOS Apps"
+      ],
+      "sameAs": [
+        "https://zerikc.github.io"
+      ]
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Floralia",
+      "applicationCategory": "HealthApplication",
+      "operatingSystem": "iOS",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.5"
+      }
+    }
+    </script>
+
+    <script src="js/logger.js"></script>
     <script src="js/script.js"></script>
 </body>
 </html>

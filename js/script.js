@@ -114,13 +114,21 @@
     let deferredPrompt;
     const installButton = document.getElementById('installButton');
     
+    // Logger utility is loaded from logger.js
+    // Use window.logger if available, otherwise create a safe fallback
+    const logger = window.logger || {
+        log: () => {},
+        error: (...args) => console.error(...args),
+        warn: () => {}
+    };
+    
     // Регистрация Service Worker
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker
                 .register('/sw.js')
                 .then((registration) => {
-                    console.log('✅ Service Worker registered:', registration.scope);
+                    logger.log('✅ Service Worker registered:', registration.scope);
                     
                     // Проверка обновлений каждые 60 секунд
                     setInterval(() => {
@@ -139,14 +147,14 @@
                     });
                 })
                 .catch((error) => {
-                    console.error('❌ Service Worker registration failed:', error);
+                    logger.error('❌ Service Worker registration failed:', error);
                 });
         });
     }
     
     // Обработка события установки PWA
     window.addEventListener('beforeinstallprompt', (e) => {
-        console.log('💾 Install prompt fired');
+        logger.log('💾 Install prompt fired');
         // Предотвращаем автоматический показ промпта
         e.preventDefault();
         // Сохраняем событие для использования позже
@@ -161,7 +169,7 @@
     if (installButton) {
         installButton.addEventListener('click', async () => {
             if (!deferredPrompt) {
-                console.log('❌ No install prompt available');
+                logger.log('❌ No install prompt available');
                 return;
             }
             
@@ -170,14 +178,14 @@
             
             // Ждем выбора пользователя
             const { outcome } = await deferredPrompt.userChoice;
-            console.log(`👤 User choice: ${outcome}`);
+            logger.log(`👤 User choice: ${outcome}`);
             
             if (outcome === 'accepted') {
-                console.log('✅ User accepted the install prompt');
+                logger.log('✅ User accepted the install prompt');
                 // Скрываем кнопку после установки
                 installButton.style.display = 'none';
             } else {
-                console.log('❌ User dismissed the install prompt');
+                logger.log('❌ User dismissed the install prompt');
             }
             
             // Очищаем сохраненный промпт
@@ -187,7 +195,7 @@
     
     // Отслеживание успешной установки
     window.addEventListener('appinstalled', (evt) => {
-        console.log('🎉 App installed successfully');
+        logger.log('🎉 App installed successfully');
         
         // Скрываем кнопку установки
         if (installButton) {
@@ -281,7 +289,7 @@
     
     // Проверка, установлено ли приложение
     if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
-        console.log('✅ Running in standalone mode');
+        logger.log('✅ Running in standalone mode');
         // Скрываем кнопку установки, если уже установлено
         if (installButton) {
             installButton.style.display = 'none';
@@ -507,7 +515,7 @@
                 }
             } catch (error) {
                 showFormMessage('error', 'Упс! Что-то пошло не так. Пожалуйста, попробуйте отправить письмо напрямую на email.');
-                console.error('Form submission error:', error);
+                logger.error('Form submission error:', error);
             } finally {
                 // Re-enable submit button
                 submitButton.disabled = false;
@@ -550,7 +558,7 @@
         }
     }
     
-    window.addEventListener('scroll', debounce(updateScrollProgress, 5));
+    // Moved to optimized scroll handler below
     
     // ================================
     // Section References (shared)
@@ -590,25 +598,7 @@
         });
     }
     
-    // Parallax on scroll with RAF for performance
-    let ticking = false;
-    
-    window.addEventListener('scroll', () => {
-        if (!ticking) {
-            window.requestAnimationFrame(() => {
-                const scrolled = window.pageYOffset;
-                
-                gradientOrbs.forEach((orb, index) => {
-                    const speed = (index + 1) * 0.15;
-                    orb.style.transform = `translateY(${scrolled * speed}px)`;
-                });
-                
-                ticking = false;
-            });
-            
-            ticking = true;
-        }
-    });
+    // Parallax on scroll - moved to optimized scroll handler below
     
     // ================================
     // Active Navigation Link Highlighting
@@ -633,7 +623,7 @@
         });
     }
     
-    window.addEventListener('scroll', highlightNavigation);
+    // Moved to optimized scroll handler above
     
     // ================================
     // Keyboard Navigation
@@ -691,9 +681,37 @@
         };
     }
     
-    // Apply debounce to scroll events
-    window.addEventListener('scroll', debounce(highlightNavigation));
-    window.addEventListener('scroll', debounce(updateScrollProgress));
+    // ================================
+    // Optimized Scroll Handler (RAF)
+    // ================================
+    // Объединяем все scroll обработчики в один для производительности
+    let scrollTicking = false;
+    function handleScroll() {
+        if (!scrollTicking) {
+            window.requestAnimationFrame(() => {
+                const scrolled = window.pageYOffset || window.scrollY || document.documentElement.scrollTop;
+                
+                // Обновление прогресса прокрутки
+                updateScrollProgress();
+                
+                // Обновление активной навигации
+                highlightNavigation();
+                
+                // Обновление активных точек
+                updateActiveDot();
+                
+                // Parallax эффект для градиентных орбов
+                gradientOrbs.forEach((orb, index) => {
+                    const speed = (index + 1) * 0.15;
+                    orb.style.transform = `translateY(${scrolled * speed}px)`;
+                });
+                
+                scrollTicking = false;
+            });
+            scrollTicking = true;
+        }
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true });
     
     // ================================
     // Scroll Chevron
@@ -702,15 +720,22 @@
     const scrollChevron = document.querySelector('.scroll-chevron');
     
     if (scrollChevron) {
-        // Hide chevron on scroll
+        // Hide chevron on scroll - используем RAF для оптимизации
+        let chevronTicking = false;
         window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            if (scrolled > 300) {
-                scrollChevron.classList.add('hidden');
-            } else {
-                scrollChevron.classList.remove('hidden');
+            if (!chevronTicking) {
+                window.requestAnimationFrame(() => {
+                    const scrolled = window.pageYOffset || window.scrollY || document.documentElement.scrollTop;
+                    if (scrolled > 300) {
+                        scrollChevron.classList.add('hidden');
+                    } else {
+                        scrollChevron.classList.remove('hidden');
+                    }
+                    chevronTicking = false;
+                });
+                chevronTicking = true;
             }
-        });
+        }, { passive: true });
         
         // Scroll to apps section on click
         scrollChevron.addEventListener('click', () => {
@@ -770,7 +795,7 @@
         });
     });
     
-    window.addEventListener('scroll', debounce(updateActiveDot, 10));
+    // Moved to optimized scroll handler above
     
     // ================================
     // Page Load Animation
@@ -801,9 +826,12 @@
     // Console Easter Egg
     // ================================
     
-    console.log('%c👋 Привет, любопытный разработчик!', 'font-size: 20px; font-weight: bold; color: #007AFF;');
-    console.log('%cЕсли ты ищешь талантливого iOS разработчика, напиши мне!', 'font-size: 14px; color: #98989D;');
-    console.log('%c📧 zerikc@icloud.com', 'font-size: 14px; color: #5856D6;');
+    // Console Easter Egg (only in development)
+    if (window.logger && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.search.includes('debug=true'))) {
+        window.logger.log('%c👋 Привет, любопытный разработчик!', 'font-size: 20px; font-weight: bold; color: #007AFF;');
+        window.logger.log('%cЕсли ты ищешь талантливого iOS разработчика, напиши мне!', 'font-size: 14px; color: #98989D;');
+        window.logger.log('%c📧 zerikc@icloud.com', 'font-size: 14px; color: #5856D6;');
+    }
     
     // ================================
     // Utility: Copy Email on Click
@@ -840,7 +868,7 @@
                         tooltip.remove();
                     }, 2000);
                 }).catch(err => {
-                    console.error('Failed to copy email:', err);
+                    logger.error('Failed to copy email:', err);
                 });
             }
         });

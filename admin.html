@@ -55,7 +55,7 @@
         <div class="login-container">
             <div class="login-card">
                 <div style="text-align: center; margin-bottom: 2rem;">
-                    <img src="images/Logomark_Full%20Color.svg" alt="Firebase" style="width: 64px; height: 64px; margin-bottom: 1rem; display: inline-block;" />
+                    <img src="images/Logomark_Full Color.svg" alt="Firebase" style="width: 64px; height: 64px; margin-bottom: 1rem; display: inline-block;" />
                 </div>
                 <h1 class="login-title">Firebase Admin Panel</h1>
                 <p class="login-subtitle">Управление Firestore данными</p>
@@ -454,6 +454,12 @@
         </div>
     </div>
 
+    <!-- Configuration -->
+    <script src="js/config.js"></script>
+    
+    <!-- Logger utility -->
+    <script src="js/logger.js"></script>
+    
     <!-- Mobile functionality -->
     <script src="js/mobile.js"></script>
     
@@ -535,23 +541,23 @@
         // Reinitialize Firebase for a specific project
         async function reinitializeFirebaseForProject(projectId, googleToken) {
             try {
-                console.log('Reinitializing Firebase for project:', projectId);
+                if (window.logger) window.logger.log('Reinitializing Firebase for project:', projectId);
                 
                 // Delete old app if exists
                 if (currentApp) {
                     try {
                         await deleteApp(currentApp);
                     } catch (e) {
-                        console.warn('Error deleting old app:', e);
+                        if (window.logger) window.logger.warn('Error deleting old app:', e);
                     }
                 }
                 
                 // Build config for the selected project
                 const firebaseConfig = ProjectManager.buildFirebaseConfig(projectId, {
-                    apiKey: "AIzaSyChXxCJysVl3RCgbu1B0wxAa7gQQkkAkXk" // Можно использовать общий API key
+                    apiKey: window.CONFIG?.FIREBASE?.API_KEY || "AIzaSyChXxCJysVl3RCgbu1B0wxAa7gQQkkAkXk"
                 });
                 
-                console.log('Initializing with config:', firebaseConfig);
+                if (window.logger) window.logger.log('Initializing with config:', firebaseConfig);
                 
                 // Initialize new app
                 currentApp = initializeApp(firebaseConfig, 'project-' + projectId);
@@ -562,10 +568,10 @@
                 window.firebaseDb = db;
                 window.googleAuthToken = googleToken;
                 
-                console.log('Firebase reinitialized successfully');
+                if (window.logger) window.logger.log('Firebase reinitialized successfully');
                 
             } catch (error) {
-                console.error('Error reinitializing Firebase:', error);
+                if (window.logger) window.logger.error('Error reinitializing Firebase:', error);
                 throw error;
             }
         }
@@ -578,7 +584,7 @@
         
         // Load admin script
         import('./js/admin.js').catch((error) => {
-            console.error('Error loading admin script:', error);
+            if (window.logger) window.logger.error('Error loading admin script:', error);
         });
     </script>
     
@@ -588,10 +594,10 @@
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js')
                     .then(registration => {
-                        console.log('SW registered:', registration);
+                        if (window.logger) window.logger.log('SW registered:', registration);
                     })
                     .catch(error => {
-                        console.log('SW registration failed:', error);
+                        if (window.logger) window.logger.error('SW registration failed:', error);
                     });
             });
         }

@@ -213,6 +213,12 @@ function preventIOSZoom() {
 let deferredPrompt;
 
 function initPWAPrompt() {
+    const isDevelopment = () => {
+        return window.location?.hostname === 'localhost' || 
+               window.location?.hostname === '127.0.0.1' ||
+               window.location?.search?.includes('debug=true');
+    };
+    
     window.addEventListener('beforeinstallprompt', (e) => {
         // Prevent default Chrome install prompt
         e.preventDefault();
@@ -224,7 +230,9 @@ function initPWAPrompt() {
     
     // Handle successful installation
     window.addEventListener('appinstalled', () => {
-        console.log('PWA установлено успешно!');
+        if (window.logger) {
+            window.logger.log('PWA установлено успешно!');
+        }
         deferredPrompt = null;
     });
 }
@@ -250,7 +258,9 @@ function showInstallPromotion() {
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
         
-        console.log(`User choice: ${outcome}`);
+        if (window.logger) {
+            window.logger.log(`User choice: ${outcome}`);
+        }
         deferredPrompt = null;
         installBanner.remove();
     });
@@ -368,9 +378,12 @@ function monitorNetworkStatus() {
 function initMobileFeatures() {
     // Check if we're on mobile
     const isMobile = window.innerWidth <= 768;
+    const isDev = window.location?.hostname === 'localhost' || window.location?.hostname === '127.0.0.1';
     
     if (isMobile) {
-        console.log('Mobile features initialized');
+        if (window.logger) {
+            window.logger.log('Mobile features initialized');
+        }
         
         initMobileMenu();
         initTouchOptimizations();

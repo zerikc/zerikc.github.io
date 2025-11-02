@@ -5,6 +5,31 @@
 const CACHE_VERSION = 'v1.0.0';
 const CACHE_NAME = `zerikc-portfolio-${CACHE_VERSION}`;
 
+// Проверка development режима (Service Worker работает изолированно)
+// Используем глобальный флаг из main thread или проверяем по origin
+const isDevelopment = self.registration?.scope?.includes('localhost') || 
+                      self.registration?.scope?.includes('127.0.0.1') ||
+                      self.location?.hostname === 'localhost' ||
+                      self.location?.hostname === '127.0.0.1';
+
+// Простой logger для Service Worker
+const swLogger = {
+    log: (...args) => {
+        if (isDevelopment) {
+            console.log(...args);
+        }
+    },
+    error: (...args) => {
+        // Ошибки всегда логируем
+        console.error(...args);
+    },
+    warn: (...args) => {
+        if (isDevelopment) {
+            console.warn(...args);
+        }
+    }
+};
+
 // Статические ресурсы для кеширования
 const STATIC_CACHE_URLS = [
   '/',
@@ -23,27 +48,27 @@ const STATIC_CACHE_URLS = [
 
 // Установка Service Worker
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing Service Worker...', CACHE_VERSION);
+  swLogger.log('[SW] Installing Service Worker...', CACHE_VERSION);
   
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('[SW] Precaching App Shell');
+        swLogger.log('[SW] Precaching App Shell');
         return cache.addAll(STATIC_CACHE_URLS);
       })
       .then(() => {
-        console.log('[SW] Installation complete');
+        swLogger.log('[SW] Installation complete');
         return self.skipWaiting();
       })
       .catch((error) => {
-        console.error('[SW] Installation failed:', error);
+        swLogger.error('[SW] Installation failed:', error);
       })
   );
 });
 
 // Активация Service Worker и очистка старых кешей
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating Service Worker...', CACHE_VERSION);
+  swLogger.log('[SW] Activating Service Worker...', CACHE_VERSION);
   
   event.waitUntil(
     caches.keys()
@@ -52,13 +77,13 @@ self.addEventListener('activate', (event) => {
           cacheNames
             .filter((name) => name !== CACHE_NAME)
             .map((name) => {
-              console.log('[SW] Deleting old cache:', name);
+              swLogger.log('[SW] Deleting old cache:', name);
               return caches.delete(name);
             })
         );
       })
       .then(() => {
-        console.log('[SW] Activation complete');
+        swLogger.log('[SW] Activation complete');
         return self.clients.claim();
       })
   );
@@ -139,7 +164,7 @@ self.addEventListener('fetch', (event) => {
             return response;
           })
           .catch((error) => {
-            console.error('[SW] Fetch failed:', error);
+            swLogger.error('[SW] Fetch failed:', error);
             
             // Возвращаем fallback для изображений
             if (request.destination === 'image') {
@@ -172,7 +197,7 @@ self.addEventListener('message', (event) => {
 
 // Периодическая синхронизация (если поддерживается)
 self.addEventListener('sync', (event) => {
-  console.log('[SW] Background sync:', event.tag);
+  swLogger.log('[SW] Background sync:', event.tag);
   
   if (event.tag === 'sync-data') {
     event.waitUntil(
@@ -182,5 +207,5 @@ self.addEventListener('sync', (event) => {
   }
 });
 
-console.log('[SW] Service Worker loaded', CACHE_VERSION);
+swLogger.log('[SW] Service Worker loaded', CACHE_VERSION);
 

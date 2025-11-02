@@ -238,6 +238,15 @@ body {
     transform: scale(1.05);
 }
 
+.theme-toggle:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.theme-toggle:focus:not(:focus-visible) {
+    outline: none;
+}
+
 .admin-toggle {
     display: flex;
     align-items: center;
@@ -259,6 +268,15 @@ body {
     background: rgba(255, 255, 255, 0.15);
     border-color: rgba(255, 255, 255, 0.2);
     transform: scale(1.05);
+}
+
+.admin-toggle:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.admin-toggle:focus:not(:focus-visible) {
+    outline: none;
 }
 
 .admin-toggle svg {
@@ -393,6 +411,16 @@ body {
 
 .nav-link:hover::after {
     width: 100%;
+}
+
+.nav-link:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 4px;
+    border-radius: 4px;
+}
+
+.nav-link:focus:not(:focus-visible) {
+    outline: none;
 }
 
 /* ================================
@@ -653,6 +681,15 @@ body {
     opacity: 1;
 }
 
+.dot:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.dot:focus:not(:focus-visible) {
+    outline: none;
+}
+
 [data-theme="light"] .dot {
     background: rgba(0, 0, 0, 0.2);
 }
@@ -708,6 +745,16 @@ body {
     overflow: hidden;
 }
 
+.btn:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+    border-radius: var(--radius-md);
+}
+
+.btn:focus:not(:focus-visible) {
+    outline: none;
+}
+
 .btn::before {
     content: '';
     position: absolute;
@@ -748,6 +795,15 @@ body {
 .btn-secondary:hover {
     background: var(--bg-card);
     border-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.btn:focus:not(:focus-visible) {
+    outline: none;
 }
 
 .btn-block {
@@ -971,6 +1027,16 @@ section {
     border-color: rgba(255, 255, 255, 0.15);
 }
 
+.app-mini-card:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+    border-radius: var(--radius-md);
+}
+
+.app-mini-card:focus:not(:focus-visible) {
+    outline: none;
+}
+
 [data-theme="light"] .app-mini-card:hover {
     border-color: rgba(0, 0, 0, 0.2);
 }
@@ -1190,6 +1256,16 @@ section {
     transform: translateY(-8px);
     border-color: rgba(255, 255, 255, 0.15);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.app-card:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+    border-radius: var(--radius-lg);
+}
+
+.app-card:focus:not(:focus-visible) {
+    outline: none;
 }
 
 .app-card:hover::before {
@@ -1523,6 +1599,16 @@ html[data-theme="light"] .app-store-badge-light {
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
 }
 
+.contact-card:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+    border-radius: var(--radius-lg);
+}
+
+.contact-card:focus:not(:focus-visible) {
+    outline: none;
+}
+
 .contact-icon {
     font-size: 2.5rem;
     margin-bottom: var(--spacing-sm);
@@ -1559,6 +1645,18 @@ html[data-theme="light"] .app-store-badge-light {
 
 .contact-card a:hover {
     color: var(--secondary-color);
+}
+
+a:focus-visible,
+.contact-card a:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+a:focus:not(:focus-visible),
+.contact-card a:focus:not(:focus-visible) {
+    outline: none;
 }
 
 .contact-card p {

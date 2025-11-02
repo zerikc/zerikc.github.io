@@ -21,7 +21,12 @@ export class ProjectManager {
             const data = localStorage.getItem(STORAGE_KEY);
             return data ? JSON.parse(data) : [];
         } catch (error) {
-            console.error('Error loading projects:', error);
+            // Silent fail in production, errors are handled by caller
+            if (window.logger) {
+                window.logger.error('Error loading projects:', error);
+            } else if (window.location?.hostname === 'localhost' || window.location?.hostname === '127.0.0.1') {
+                console.error('Error loading projects:', error);
+            }
             return [];
         }
     }
@@ -30,7 +35,12 @@ export class ProjectManager {
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(this.projects));
         } catch (error) {
-            console.error('Error saving projects:', error);
+            // Silent fail in production
+            if (window.logger) {
+                window.logger.error('Error saving projects:', error);
+            } else if (window.location?.hostname === 'localhost' || window.location?.hostname === '127.0.0.1') {
+                console.error('Error saving projects:', error);
+            }
         }
     }
 
@@ -38,7 +48,12 @@ export class ProjectManager {
         try {
             return localStorage.getItem(CURRENT_PROJECT_KEY) || null;
         } catch (error) {
-            console.error('Error loading current project:', error);
+            // Silent fail in production
+            if (window.logger) {
+                window.logger.error('Error loading current project:', error);
+            } else if (window.location?.hostname === 'localhost' || window.location?.hostname === '127.0.0.1') {
+                console.error('Error loading current project:', error);
+            }
             return null;
         }
     }
@@ -52,7 +67,12 @@ export class ProjectManager {
             }
             this.currentProjectId = projectId;
         } catch (error) {
-            console.error('Error saving current project:', error);
+            // Silent fail in production
+            if (window.logger) {
+                window.logger.error('Error saving current project:', error);
+            } else if (window.location?.hostname === 'localhost' || window.location?.hostname === '127.0.0.1') {
+                console.error('Error saving current project:', error);
+            }
         }
     }
 
@@ -132,7 +152,12 @@ export class ProjectManager {
     setCurrentProject(projectId) {
         const project = this.getProject(projectId);
         if (!project) {
-            console.error('Project not found:', projectId);
+            // Silent fail in production
+            if (window.logger) {
+                window.logger.error('Project not found:', projectId);
+            } else if (window.location?.hostname === 'localhost' || window.location?.hostname === '127.0.0.1') {
+                console.error('Project not found:', projectId);
+            }
             return false;
         }
         this.saveCurrentProjectId(projectId);
@@ -148,7 +173,12 @@ export class ProjectManager {
     updateProject(projectId, updates) {
         const projectIndex = this.projects.findIndex(p => p.id === projectId);
         if (projectIndex === -1) {
-            console.error('Project not found:', projectId);
+            // Silent fail in production
+            if (window.logger) {
+                window.logger.error('Project not found:', projectId);
+            } else if (window.location?.hostname === 'localhost' || window.location?.hostname === '127.0.0.1') {
+                console.error('Project not found:', projectId);
+            }
             return null;
         }
 
@@ -174,7 +204,10 @@ export class ProjectManager {
     deleteProject(projectId) {
         const projectIndex = this.projects.findIndex(p => p.id === projectId);
         if (projectIndex === -1) {
-            console.error('Project not found:', projectId);
+            // Silent fail in production
+            if (window.location?.hostname === 'localhost' || window.location?.hostname === '127.0.0.1') {
+                console.error('Project not found:', projectId);
+            }
             return false;
         }
 
@@ -245,7 +278,12 @@ export class ProjectManager {
             return data.projects || [];
             
         } catch (error) {
-            console.error('Error fetching projects:', error);
+            // Always log network errors
+            if (window.logger) {
+                window.logger.error('Error fetching projects:', error);
+            } else {
+                console.error('Error fetching projects:', error);
+            }
             throw error;
         }
     }
@@ -322,7 +360,12 @@ export class ProjectManager {
 
             return true;
         } catch (error) {
-            console.error('Error importing projects:', error);
+            // Always log import errors
+            if (window.logger) {
+                window.logger.error('Error importing projects:', error);
+            } else if (window.location?.hostname === 'localhost' || window.location?.hostname === '127.0.0.1') {
+                console.error('Error importing projects:', error);
+            }
             return false;
         }
     }
