@@ -48,7 +48,14 @@ const state = {
     editingDocId: null,
     collections: [],
     collectionsLoading: false,
-    isInitialLoad: true // Флаг первой загрузки - всегда показывать экран входа
+    isInitialLoad: true, // Флаг первой загрузки - всегда показывать экран входа
+    // Firestore usage tracking
+    firestoreUsage: {
+        reads: [],
+        writes: [],
+        deletes: [],
+        timestamps: []
+    }
 };
 
 let db = null;
@@ -63,6 +70,73 @@ function checkFirebaseInit() {
 }
 
 checkFirebaseInit();
+
+// ================================
+// Firestore Usage Tracking
+// ================================
+
+function trackFirestoreOperation(type, count = 1) {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    
+    // Load from localStorage
+    const storageKey = 'firestoreUsage';
+    let usage = JSON.parse(localStorage.getItem(storageKey) || '{}');
+    
+    if (!usage.reads) usage.reads = [];
+    if (!usage.writes) usage.writes = [];
+    if (!usage.deletes) usage.deletes = [];
+    if (!usage.timestamps) usage.timestamps = [];
+    
+    // Add today's data if not exists
+    const todayIndex = usage.timestamps.findIndex(t => new Date(t).setHours(0,0,0,0) === today);
+    if (todayIndex === -1) {
+        usage.timestamps.push(new Date(today).toISOString());
+        usage.reads.push(0);
+        usage.writes.push(0);
+        usage.deletes.push(0);
+    }
+    
+    // Update today's count
+    const index = usage.timestamps.length - 1;
+    if (type === 'read') {
+        usage.reads[index] = (usage.reads[index] || 0) + count;
+    } else if (type === 'write') {
+        usage.writes[index] = (usage.writes[index] || 0) + count;
+    } else if (type === 'delete') {
+        usage.deletes[index] = (usage.deletes[index] || 0) + count;
+    }
+    
+    // Keep only last 30 days
+    if (usage.timestamps.length > 30) {
+        usage.timestamps.shift();
+        usage.reads.shift();
+        usage.writes.shift();
+        usage.deletes.shift();
+    }
+    
+    // Save to localStorage
+    localStorage.setItem(storageKey, JSON.stringify(usage));
+    
+    // Update state
+    state.firestoreUsage = usage;
+    
+    // Update chart
+    updateFirestoreChart();
+}
+
+function loadFirestoreUsage() {
+    const storageKey = 'firestoreUsage';
+    const usage = JSON.parse(localStorage.getItem(storageKey) || '{}');
+    
+    if (!usage.reads) usage.reads = [];
+    if (!usage.writes) usage.writes = [];
+    if (!usage.deletes) usage.deletes = [];
+    if (!usage.timestamps) usage.timestamps = [];
+    
+    state.firestoreUsage = usage;
+    updateFirestoreChart();
+}
 
 // ================================
 // DOM Elements
@@ -712,6 +786,7 @@ async function getCollectionStats(collectionName) {
         
         const colRef = collection(db, collectionName);
         const firstDocSnapshot = await getDocs(query(colRef, limit(1)));
+        trackFirestoreOperation('read', firstDocSnapshot.size);
         const hasDocuments = !firstDocSnapshot.empty;
         
         return {
@@ -859,6 +934,134 @@ function updateStatistics() {
     if (elements.activeCollections) elements.activeCollections.textContent = active;
     if (elements.totalDocuments) elements.totalDocuments.textContent = totalDocsText;
     if (elements.restrictedCollections) elements.restrictedCollections.textContent = restricted;
+    
+    // Update Firestore usage stats
+    updateFirestoreStats();
+}
+
+function updateFirestoreStats() {
+    const usage = state.firestoreUsage;
+    
+    // Calculate today's stats
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayTimestamp = today.getTime();
+    
+    const todayIndex = usage.timestamps ? usage.timestamps.findIndex(t => {
+        const date = new Date(t);
+        date.setHours(0, 0, 0, 0);
+        return date.getTime() === todayTimestamp;
+    }) : -1;
+    
+    const todayReads = todayIndex !== -1 && usage.reads ? usage.reads[todayIndex] || 0 : 0;
+    const todayWrites = todayIndex !== -1 && usage.writes ? usage.writes[todayIndex] || 0 : 0;
+    
+    // Calculate total
+    const totalReads = usage.reads ? usage.reads.reduce((a, b) => a + (b || 0), 0) : 0;
+    
+    // Update UI
+    const todayReadsEl = document.getElementById('todayReads');
+    const todayWritesEl = document.getElementById('todayWrites');
+    const totalReadsEl = document.getElementById('totalReads');
+    
+    if (todayReadsEl) todayReadsEl.textContent = todayReads.toLocaleString('ru-RU');
+    if (todayWritesEl) todayWritesEl.textContent = todayWrites.toLocaleString('ru-RU');
+    if (totalReadsEl) totalReadsEl.textContent = totalReads.toLocaleString('ru-RU');
+}
+
+function updateFirestoreChart() {
+    const canvas = document.getElementById('firestoreUsageChart');
+    if (!canvas) return;
+    
+    // Set canvas size based on container
+    const container = canvas.parentElement;
+    if (container && container.offsetWidth) {
+        const containerWidth = container.offsetWidth;
+        const aspectRatio = 600 / 200;
+        canvas.width = containerWidth;
+        canvas.height = Math.round(canvas.width / aspectRatio);
+    }
+    
+    const ctx = canvas.getContext('2d');
+    const usage = state.firestoreUsage;
+    
+    if (!usage.timestamps || usage.timestamps.length === 0) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const textColor = getComputedStyle(document.documentElement).getPropertyValue('--apple-text-secondary') || '#666';
+        ctx.fillStyle = textColor;
+        ctx.font = '14px -apple-system, BlinkMacSystemFont, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Нет данных', canvas.width / 2, canvas.height / 2);
+        return;
+    }
+    
+    // Get last 7 days
+    const daysToShow = Math.min(7, usage.timestamps.length);
+    const timestamps = usage.timestamps.slice(-daysToShow);
+    const reads = usage.reads.slice(-daysToShow);
+    const writes = usage.writes.slice(-daysToShow);
+    const deletes = usage.deletes.slice(-daysToShow);
+    
+    // Calculate max value for scaling
+    const maxReads = Math.max(...reads, 1);
+    const maxWrites = Math.max(...writes, 1);
+    const maxDeletes = Math.max(...deletes, 1);
+    const maxValue = Math.max(maxReads, maxWrites, maxDeletes, 1);
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Chart dimensions
+    const padding = 40;
+    const chartWidth = canvas.width - padding * 2;
+    const chartHeight = canvas.height - padding * 2;
+    const barWidth = chartWidth / (daysToShow * 3 + (daysToShow - 1));
+    const groupWidth = barWidth * 3 + barWidth;
+    
+    // Colors
+    const readColor = '#007AFF';
+    const writeColor = '#34C759';
+    const deleteColor = '#FF3B30';
+    
+    // Draw bars
+    timestamps.forEach((timestamp, index) => {
+        const x = padding + index * groupWidth;
+        
+        const readHeight = (reads[index] || 0) / maxValue * chartHeight;
+        const writeHeight = (writes[index] || 0) / maxValue * chartHeight;
+        const deleteHeight = (deletes[index] || 0) / maxValue * chartHeight;
+        
+        // Draw reads
+        if (readHeight > 0) {
+            ctx.fillStyle = readColor;
+            ctx.fillRect(x, canvas.height - padding - readHeight, barWidth, readHeight);
+        }
+        
+        // Draw writes
+        if (writeHeight > 0) {
+            ctx.fillStyle = writeColor;
+            ctx.fillRect(x + barWidth, canvas.height - padding - writeHeight, barWidth, writeHeight);
+        }
+        
+        // Draw deletes
+        if (deleteHeight > 0) {
+            ctx.fillStyle = deleteColor;
+            ctx.fillRect(x + barWidth * 2, canvas.height - padding - deleteHeight, barWidth, deleteHeight);
+        }
+        
+        // Draw date label
+        const date = new Date(timestamp);
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const labelColor = getComputedStyle(document.documentElement).getPropertyValue('--apple-text-secondary') || '#666';
+        ctx.fillStyle = labelColor;
+        ctx.font = '11px -apple-system, BlinkMacSystemFont, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${day}.${month}`, x + barWidth * 1.5, canvas.height - padding + 20);
+    });
+    
+    // Update stats
+    updateFirestoreStats();
 }
 
 // Render collections list (Apple style)
@@ -1038,6 +1241,10 @@ function showView(viewName) {
     if (viewName === 'dashboard' && elements.dashboardView) {
         elements.dashboardView.style.display = 'block';
         elements.dashboardView.classList.add('active');
+        // Load Firestore usage data when showing dashboard
+        setTimeout(() => {
+            loadFirestoreUsage();
+        }, 100);
     } else if (viewName === 'collections' && elements.collectionsView) {
         elements.collectionsView.style.display = 'block';
         elements.collectionsView.classList.add('active');
@@ -1139,6 +1346,7 @@ async function loadCollection() {
         
         // Execute query
         const snapshot = await getDocs(q);
+        trackFirestoreOperation('read', snapshot.size);
         
         state.documents = [];
         snapshot.forEach((docSnapshot) => {
@@ -1352,15 +1560,18 @@ if (elements.saveDocumentBtn) {
             // Update existing document
             const docRef = doc(db, state.currentCollection, state.editingDocId);
             await updateDoc(docRef, data);
+            trackFirestoreOperation('write', 1);
             showToast('Документ обновлен', 'success');
         } else if (docId) {
             // Create with specific ID
             const docRef = doc(db, state.currentCollection, docId);
             await setDoc(docRef, data);
+            trackFirestoreOperation('write', 1);
             showToast('Документ создан', 'success');
         } else {
             // Create with auto ID
             await addDoc(collection(db, state.currentCollection), data);
+            trackFirestoreOperation('write', 1);
             showToast('Документ создан', 'success');
         }
         
@@ -1391,6 +1602,7 @@ function showDeleteModal(docId) {
             
             const docRef = doc(db, state.currentCollection, docId);
             await deleteDoc(docRef);
+            trackFirestoreOperation('delete', 1);
             
             elements.deleteModal.style.display = 'none';
             showToast('Документ удален', 'success');
@@ -1519,6 +1731,9 @@ function showAdminPanel() {
     if (elements.currentProjectName && state.currentProject) {
         elements.currentProjectName.textContent = state.currentProject.name;
     }
+    
+    // Load Firestore usage data and update chart
+    loadFirestoreUsage();
     
     // Initialize event listeners for new structure
     setTimeout(() => {

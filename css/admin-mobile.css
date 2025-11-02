@@ -306,12 +306,13 @@ body {
 
 @media (max-width: 768px) {
     .collections-list {
-        gap: var(--spacing-xs);
+        gap: var(--spacing-sm);
     }
     
     .collection-list-item {
         padding: var(--spacing-md);
         min-height: 64px;
+        margin-bottom: 0;
     }
     
     .collection-list-item-icon {
