@@ -891,7 +891,7 @@ section {
    ================================ */
 
 .apps {
-    background: var(--bg-secondary);
+    background: transparent;
 }
 
 .apps .container {
@@ -1579,7 +1579,7 @@ html[data-theme="light"] .app-store-badge-light {
    ================================ */
 
 .contact {
-    background: var(--bg-secondary);
+    background: transparent;
 }
 
 .contact-cards {
