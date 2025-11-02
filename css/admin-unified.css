@@ -381,6 +381,7 @@ select:focus-visible,
     flex-direction: column;
     gap: var(--spacing-xs);
     padding: 0 var(--spacing-md);
+    margin-top: var(--spacing-sm);
 }
 
 .sidebar-filter {
@@ -681,14 +682,17 @@ select:focus-visible,
 }
 
 .stat-chart-container {
+    position: relative;
     width: 100%;
     margin-bottom: var(--spacing-20);
+    min-height: 300px;
 }
 
 .stat-chart-container canvas {
     width: 100%;
     height: auto;
     display: block;
+    max-height: 400px;
 }
 
 .stat-chart-stats {

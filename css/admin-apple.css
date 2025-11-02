@@ -310,6 +310,7 @@
     flex-direction: column;
     gap: var(--apple-spacing-xs);
     padding: 0 var(--apple-spacing-md);
+    margin-top: var(--apple-spacing-sm);
 }
 
 .sidebar-filter {
@@ -598,15 +599,17 @@
 }
 
 .stat-chart-container {
+    position: relative;
     width: 100%;
     margin-bottom: var(--apple-spacing-md);
+    min-height: 300px;
 }
 
 .stat-chart-container canvas {
     width: 100%;
     height: auto;
     display: block;
-    max-height: 250px;
+    max-height: 400px;
 }
 
 .stat-chart-stats {

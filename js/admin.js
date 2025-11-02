@@ -955,6 +955,12 @@ function updateFirestoreStats() {
     
     const todayReads = todayIndex !== -1 && usage.reads ? usage.reads[todayIndex] || 0 : 0;
     const todayWrites = todayIndex !== -1 && usage.writes ? usage.writes[todayIndex] || 0 : 0;
+    const todayDeletes = todayIndex !== -1 && usage.deletes ? usage.deletes[todayIndex] || 0 : 0;
+    
+    // Calculate totals for last 7 days
+    const last7Days = Math.min(7, usage.timestamps ? usage.timestamps.length : 0);
+    const last7DaysReads = usage.reads ? usage.reads.slice(-last7Days).reduce((a, b) => a + (b || 0), 0) : 0;
+    const last7DaysWrites = usage.writes ? usage.writes.slice(-last7Days).reduce((a, b) => a + (b || 0), 0) : 0;
     
     // Calculate total
     const totalReads = usage.reads ? usage.reads.reduce((a, b) => a + (b || 0), 0) : 0;
@@ -966,18 +972,18 @@ function updateFirestoreStats() {
     
     if (todayReadsEl) todayReadsEl.textContent = todayReads.toLocaleString('ru-RU');
     if (todayWritesEl) todayWritesEl.textContent = todayWrites.toLocaleString('ru-RU');
-    if (totalReadsEl) totalReadsEl.textContent = totalReads.toLocaleString('ru-RU');
+    if (totalReadsEl) totalReadsEl.textContent = last7DaysReads.toLocaleString('ru-RU');
 }
 
 function updateFirestoreChart() {
     const canvas = document.getElementById('firestoreUsageChart');
     if (!canvas) return;
     
-    // Set canvas size based on container
+    // Set canvas size based on container - увеличиваем высоту для лучшей читаемости
     const container = canvas.parentElement;
     if (container && container.offsetWidth) {
         const containerWidth = container.offsetWidth;
-        const aspectRatio = 600 / 200;
+        const aspectRatio = 600 / 300; // Увеличили высоту графика
         canvas.width = containerWidth;
         canvas.height = Math.round(canvas.width / aspectRatio);
     }
@@ -1002,66 +1008,152 @@ function updateFirestoreChart() {
     const writes = usage.writes.slice(-daysToShow);
     const deletes = usage.deletes.slice(-daysToShow);
     
-    // Calculate max value for scaling
-    const maxReads = Math.max(...reads, 1);
-    const maxWrites = Math.max(...writes, 1);
-    const maxDeletes = Math.max(...deletes, 1);
-    const maxValue = Math.max(maxReads, maxWrites, maxDeletes, 1);
+    // Calculate max value for scaling (with some padding)
+    const allValues = [...reads, ...writes, ...deletes];
+    const maxValue = Math.max(...allValues, 1);
+    const yAxisMax = Math.ceil(maxValue * 1.1); // Добавляем 10% отступа сверху
     
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Chart dimensions
-    const padding = 40;
-    const chartWidth = canvas.width - padding * 2;
-    const chartHeight = canvas.height - padding * 2;
-    const barWidth = chartWidth / (daysToShow * 3 + (daysToShow - 1));
-    const groupWidth = barWidth * 3 + barWidth;
+    // Chart dimensions - увеличенные отступы для осей
+    const leftPadding = 60;
+    const rightPadding = 20;
+    const topPadding = 40;
+    const bottomPadding = 50;
+    const chartWidth = canvas.width - leftPadding - rightPadding;
+    const chartHeight = canvas.height - topPadding - bottomPadding;
     
-    // Colors
-    const readColor = '#007AFF';
-    const writeColor = '#34C759';
-    const deleteColor = '#FF3B30';
+    // Colors with alpha for better visualization
+    const readColor = 'rgba(0, 122, 255, 0.8)';
+    const writeColor = 'rgba(52, 199, 89, 0.8)';
+    const deleteColor = 'rgba(255, 59, 48, 0.8)';
+    const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--apple-separator') || 'rgba(60, 60, 67, 0.3)';
+    const textColor = getComputedStyle(document.documentElement).getPropertyValue('--apple-text-primary') || '#000';
+    const secondaryTextColor = getComputedStyle(document.documentElement).getPropertyValue('--apple-text-secondary') || '#666';
     
-    // Draw bars
+    // Draw grid lines (Y-axis)
+    const gridLinesCount = 5;
+    ctx.strokeStyle = gridColor;
+    ctx.lineWidth = 0.5;
+    ctx.setLineDash([2, 2]);
+    
+    for (let i = 0; i <= gridLinesCount; i++) {
+        const y = topPadding + (chartHeight / gridLinesCount) * i;
+        ctx.beginPath();
+        ctx.moveTo(leftPadding, y);
+        ctx.lineTo(leftPadding + chartWidth, y);
+        ctx.stroke();
+        
+        // Y-axis labels
+        const value = yAxisMax - (yAxisMax / gridLinesCount) * i;
+        ctx.fillStyle = secondaryTextColor;
+        ctx.font = '11px -apple-system, BlinkMacSystemFont, sans-serif';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        ctx.setLineDash([]);
+        ctx.fillText(value.toLocaleString('ru-RU'), leftPadding - 8, y);
+    }
+    
+    ctx.setLineDash([]);
+    
+    // Calculate bar dimensions
+    const barSpacing = 8;
+    const groupWidth = chartWidth / daysToShow;
+    const barWidth = (groupWidth - barSpacing * 2) / 3;
+    
+    // Draw grouped bars with better styling
     timestamps.forEach((timestamp, index) => {
-        const x = padding + index * groupWidth;
+        const groupX = leftPadding + index * groupWidth + barSpacing;
+        const baseY = topPadding + chartHeight;
         
-        const readHeight = (reads[index] || 0) / maxValue * chartHeight;
-        const writeHeight = (writes[index] || 0) / maxValue * chartHeight;
-        const deleteHeight = (deletes[index] || 0) / maxValue * chartHeight;
+        const readValue = reads[index] || 0;
+        const writeValue = writes[index] || 0;
+        const deleteValue = deletes[index] || 0;
         
-        // Draw reads
+        const readHeight = (readValue / yAxisMax) * chartHeight;
+        const writeHeight = (writeValue / yAxisMax) * chartHeight;
+        const deleteHeight = (deleteValue / yAxisMax) * chartHeight;
+        
+        // Draw reads bar
         if (readHeight > 0) {
             ctx.fillStyle = readColor;
-            ctx.fillRect(x, canvas.height - padding - readHeight, barWidth, readHeight);
+            const borderRadius = 4;
+            ctx.beginPath();
+            ctx.roundRect(groupX, baseY - readHeight, barWidth, readHeight, borderRadius);
+            ctx.fill();
         }
         
-        // Draw writes
+        // Draw writes bar
         if (writeHeight > 0) {
             ctx.fillStyle = writeColor;
-            ctx.fillRect(x + barWidth, canvas.height - padding - writeHeight, barWidth, writeHeight);
+            ctx.beginPath();
+            ctx.roundRect(groupX + barWidth + barSpacing, baseY - writeHeight, barWidth, writeHeight, 4);
+            ctx.fill();
         }
         
-        // Draw deletes
+        // Draw deletes bar
         if (deleteHeight > 0) {
             ctx.fillStyle = deleteColor;
-            ctx.fillRect(x + barWidth * 2, canvas.height - padding - deleteHeight, barWidth, deleteHeight);
+            ctx.beginPath();
+            ctx.roundRect(groupX + (barWidth + barSpacing) * 2, baseY - deleteHeight, barWidth, deleteHeight, 4);
+            ctx.fill();
         }
         
         // Draw date label
         const date = new Date(timestamp);
-        const day = date.getDate();
-        const month = date.getMonth() + 1;
-        const labelColor = getComputedStyle(document.documentElement).getPropertyValue('--apple-text-secondary') || '#666';
-        ctx.fillStyle = labelColor;
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const chartDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        
+        let dateLabel;
+        if (chartDate.getTime() === today.getTime()) {
+            dateLabel = 'Сегодня';
+        } else if (chartDate.getTime() === today.getTime() - 86400000) {
+            dateLabel = 'Вчера';
+        } else {
+            const dayNames = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+            dateLabel = dayNames[date.getDay()];
+        }
+        
+        ctx.fillStyle = secondaryTextColor;
         ctx.font = '11px -apple-system, BlinkMacSystemFont, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(`${day}.${month}`, x + barWidth * 1.5, canvas.height - padding + 20);
+        ctx.textBaseline = 'top';
+        ctx.fillText(dateLabel, leftPadding + index * groupWidth + groupWidth / 2, baseY + 8);
+        
+        // Day number below
+        ctx.font = '10px -apple-system, BlinkMacSystemFont, sans-serif';
+        ctx.fillText(date.getDate() + '.' + (date.getMonth() + 1), leftPadding + index * groupWidth + groupWidth / 2, baseY + 24);
     });
+    
+    // Draw X-axis line
+    ctx.strokeStyle = gridColor;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(leftPadding, topPadding + chartHeight);
+    ctx.lineTo(leftPadding + chartWidth, topPadding + chartHeight);
+    ctx.stroke();
     
     // Update stats
     updateFirestoreStats();
+}
+
+// Add roundRect polyfill if not available
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function(x, y, width, height, radius) {
+        this.beginPath();
+        this.moveTo(x + radius, y);
+        this.lineTo(x + width - radius, y);
+        this.quadraticCurveTo(x + width, y, x + width, y + radius);
+        this.lineTo(x + width, y + height - radius);
+        this.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        this.lineTo(x + radius, y + height);
+        this.quadraticCurveTo(x, y + height, x, y + height - radius);
+        this.lineTo(x, y + radius);
+        this.quadraticCurveTo(x, y, x + radius, y);
+        this.closePath();
+    };
 }
 
 // Render collections list (Apple style)
