@@ -325,6 +325,7 @@
                         </div>
                         <div class="stat-chart-container">
                             <canvas id="hourlyChart" width="600" height="280"></canvas>
+                            <div id="hourlyChartTooltip" class="chart-tooltip" style="display: none;"></div>
                         </div>
                     </div>
                     
@@ -349,6 +350,7 @@
                         </div>
                         <div class="stat-chart-container">
                             <canvas id="dailyChart" width="600" height="280"></canvas>
+                            <div id="dailyChartTooltip" class="chart-tooltip" style="display: none;"></div>
                         </div>
                     </div>
                 </div>
@@ -582,7 +584,7 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp, deleteApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getFirestore, connectFirestoreEmulator } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, initializeFirestore, CACHE_SIZE_UNLIMITED } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
         import { projectManager, ProjectManager } from './js/project-manager.js';
         
         let currentApp = null;
@@ -610,7 +612,13 @@
                 
                 // Initialize new app
                 currentApp = initializeApp(firebaseConfig, 'project-' + projectId);
-                const db = getFirestore(currentApp);
+                
+                // Initialize Firestore with settings to prevent persistent connections
+                // Use experimentalForceLongPolling to avoid WebSocket/Stream connections that cause CORS issues
+                const db = initializeFirestore(currentApp, {
+                    experimentalForceLongPolling: true,
+                    experimentalAutoDetectLongPolling: false
+                });
                 
                 // Export for use in admin.js
                 window.firebaseApp = currentApp;
@@ -621,7 +629,15 @@
                 
             } catch (error) {
                 if (window.logger) window.logger.error('Error reinitializing Firebase:', error);
-                throw error;
+                // Fallback to regular getFirestore if initializeFirestore fails
+                try {
+                    const db = getFirestore(currentApp);
+                    window.firebaseDb = db;
+                    if (window.logger) window.logger.log('Firebase initialized with fallback method');
+                } catch (fallbackError) {
+                    if (window.logger) window.logger.error('Fallback initialization failed:', fallbackError);
+                    throw error;
+                }
             }
         }
         

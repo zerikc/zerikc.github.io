@@ -114,16 +114,27 @@ function trackFirestoreOperation(type, count = 1) {
     });
     
     // Add today's data if not exists (daily tracking)
-    const todayIndex = usage.timestamps.findIndex(t => new Date(t).setHours(0,0,0,0) === today);
+    let todayIndex = -1;
+    for (let i = 0; i < usage.timestamps.length; i++) {
+        const timestamp = usage.timestamps[i];
+        const date = new Date(timestamp);
+        date.setHours(0, 0, 0, 0);
+        if (date.getTime() === today) {
+            todayIndex = i;
+            break;
+        }
+    }
+    
     if (todayIndex === -1) {
         usage.timestamps.push(new Date(today).toISOString());
         usage.reads.push(0);
         usage.writes.push(0);
         usage.deletes.push(0);
+        todayIndex = usage.timestamps.length - 1;
     }
     
     // Update today's count
-    const index = usage.timestamps.length - 1;
+    const index = todayIndex;
     if (type === 'read') {
         usage.reads[index] = (usage.reads[index] || 0) + count;
     } else if (type === 'write') {
@@ -146,9 +157,7 @@ function trackFirestoreOperation(type, count = 1) {
     // Update state
     state.firestoreUsage = usage;
     
-    // Update charts
-    updateHourlyChart();
-    updateDailyChart();
+    // Charts will be updated when project is selected
 }
 
 function loadFirestoreUsage() {
@@ -162,8 +171,11 @@ function loadFirestoreUsage() {
     if (!usage.hourlyData) usage.hourlyData = {};
     
     state.firestoreUsage = usage;
-    updateHourlyChart();
-    updateDailyChart();
+    // Charts will be loaded from API when project is selected
+    if (state.currentProject && window.googleAuthToken) {
+        updateHourlyChart();
+        updateDailyChart();
+    }
 }
 
 // ================================
@@ -388,6 +400,9 @@ async function initializeFirebaseForProject(project) {
                 logger.log('Loading collections after project switch...');
                 await loadAllCollections();
                 // Статистика обновится автоматически в loadAllCollections() через updateStatistics()
+                // Обновляем графики с данными из API
+                updateHourlyChart();
+                updateDailyChart();
             }
         }, 300);
         
@@ -1006,7 +1021,7 @@ function updateFirestoreStats() {
 // Hourly Chart (24 hours)
 // ================================
 
-function updateHourlyChart() {
+async function updateHourlyChart() {
     const canvas = document.getElementById('hourlyChart');
     if (!canvas) return;
     
@@ -1020,44 +1035,50 @@ function updateHourlyChart() {
     }
     
     const ctx = canvas.getContext('2d');
-    const usage = state.firestoreUsage;
     
-    if (!usage.hourlyData || Object.keys(usage.hourlyData).length === 0) {
+    // Проверяем, есть ли доступ к проекту и токену
+    if (!state.currentProject || !window.googleAuthToken) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         const textColor = getComputedStyle(document.documentElement).getPropertyValue('--apple-text-secondary') || '#666';
         ctx.fillStyle = textColor;
         ctx.font = '14px -apple-system, BlinkMacSystemFont, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('Нет данных', canvas.width / 2, canvas.height / 2);
+        ctx.fillText('Выберите проект для загрузки данных', canvas.width / 2, canvas.height / 2);
         return;
     }
     
-    // Prepare hourly data for last 24 hours
-    const now = new Date();
-    const hours = [];
-    const reads = [];
-    const writes = [];
-    const deletes = [];
-    
-    for (let i = 23; i >= 0; i--) {
-        const hourDate = new Date(now.getTime() - i * 60 * 60 * 1000);
-        const hour = hourDate.getHours();
-        const hourKey = `${hourDate.getFullYear()}-${hourDate.getMonth()}-${hourDate.getDate()}-${hour}`;
+    try {
+        // Получаем данные из API
+        const hoursData = await ProjectManager.getFirestoreHourlyData(state.currentProject.id, window.googleAuthToken);
         
-        hours.push(hour);
-        reads.push(usage.hourlyData[hourKey]?.reads || 0);
-        writes.push(usage.hourlyData[hourKey]?.writes || 0);
-        deletes.push(usage.hourlyData[hourKey]?.deletes || 0);
+        drawLineChart(ctx, canvas, hoursData.labels, hoursData.reads, hoursData.writes, hoursData.deletes, true);
+        setupChartTooltip(canvas, 'hourlyChartTooltip', hoursData.labels, hoursData.reads, hoursData.writes, hoursData.deletes, true);
+    } catch (error) {
+        // Логируем только если это не ошибка биллинга (чтобы не засорять консоль)
+        if (error.type !== 'BILLING_REQUIRED') {
+            logger.error('Error loading hourly chart data:', error);
+        }
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const textColor = getComputedStyle(document.documentElement).getPropertyValue('--apple-text-secondary') || '#666';
+        ctx.fillStyle = textColor;
+        ctx.font = '14px -apple-system, BlinkMacSystemFont, sans-serif';
+        ctx.textAlign = 'center';
+        
+        // Показываем специальное сообщение для ошибки биллинга
+        if (error.type === 'BILLING_REQUIRED') {
+            ctx.fillText('Для просмотра метрик необходимо', canvas.width / 2, canvas.height / 2 - 20);
+            ctx.fillText('включить биллинг в Google Cloud Console', canvas.width / 2, canvas.height / 2 + 10);
+        } else {
+            ctx.fillText('Ошибка загрузки данных', canvas.width / 2, canvas.height / 2);
+        }
     }
-    
-    drawLineChart(ctx, canvas, hours, reads, writes, deletes, true);
 }
 
 // ================================
 // Daily Chart (7 days)
 // ================================
 
-function updateDailyChart() {
+async function updateDailyChart() {
     const canvas = document.getElementById('dailyChart');
     if (!canvas) return;
     
@@ -1071,50 +1092,77 @@ function updateDailyChart() {
     }
     
     const ctx = canvas.getContext('2d');
-    const usage = state.firestoreUsage;
     
-    if (!usage.timestamps || usage.timestamps.length === 0) {
+    // Проверяем, есть ли доступ к проекту и токену
+    if (!state.currentProject || !window.googleAuthToken) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         const textColor = getComputedStyle(document.documentElement).getPropertyValue('--apple-text-secondary') || '#666';
         ctx.fillStyle = textColor;
         ctx.font = '14px -apple-system, BlinkMacSystemFont, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('Нет данных', canvas.width / 2, canvas.height / 2);
+        ctx.fillText('Выберите проект для загрузки данных', canvas.width / 2, canvas.height / 2);
         return;
     }
     
-    // Get last 7 days
-    const daysToShow = Math.min(7, usage.timestamps.length);
-    const timestamps = usage.timestamps.slice(-daysToShow);
-    const reads = usage.reads.slice(-daysToShow);
-    const writes = usage.writes.slice(-daysToShow);
-    const deletes = usage.deletes.slice(-daysToShow);
-    
-    // Convert timestamps to day labels
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const labels = timestamps.map((timestamp, index) => {
-        const date = new Date(timestamp);
-        const chartDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    try {
+        // Получаем данные из API
+        const daysData = await ProjectManager.getFirestoreDailyData(state.currentProject.id, window.googleAuthToken);
         
-        if (chartDate.getTime() === today.getTime()) {
-            return 'Сегодня';
-        } else if (chartDate.getTime() === today.getTime() - 86400000) {
-            return 'Вчера';
-        } else {
-            const dayNames = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
-            return dayNames[date.getDay()];
+        // Логируем полученные данные для отладки
+        if (logger && (window.location?.hostname === 'localhost' || window.location?.hostname === '127.0.0.1')) {
+            logger.log('Daily chart data:', {
+                labels: daysData.labels,
+                reads: daysData.reads,
+                writes: daysData.writes,
+                deletes: daysData.deletes,
+                totalReads: daysData.reads.reduce((a, b) => a + b, 0),
+                totalWrites: daysData.writes.reduce((a, b) => a + b, 0),
+                totalDeletes: daysData.deletes.reduce((a, b) => a + b, 0)
+            });
         }
-    });
-    
-    drawLineChart(ctx, canvas, labels, reads, writes, deletes, false);
+        
+        // Проверяем, есть ли хотя бы какие-то данные
+        const hasData = daysData.reads.some(v => v > 0) || daysData.writes.some(v => v > 0) || daysData.deletes.some(v => v > 0);
+        
+        if (!hasData) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const textColor = getComputedStyle(document.documentElement).getPropertyValue('--apple-text-secondary') || '#666';
+            ctx.fillStyle = textColor;
+            ctx.font = '14px -apple-system, BlinkMacSystemFont, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Нет данных за последние 7 дней', canvas.width / 2, canvas.height / 2);
+            return;
+        }
+        
+        drawLineChart(ctx, canvas, daysData.labels, daysData.reads, daysData.writes, daysData.deletes, false);
+        setupChartTooltip(canvas, 'dailyChartTooltip', daysData.labels, daysData.reads, daysData.writes, daysData.deletes, false);
+    } catch (error) {
+        // Логируем только если это не ошибка биллинга (чтобы не засорять консоль)
+        if (error.type !== 'BILLING_REQUIRED') {
+            logger.error('Error loading daily chart data:', error);
+        }
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const textColor = getComputedStyle(document.documentElement).getPropertyValue('--apple-text-secondary') || '#666';
+        ctx.fillStyle = textColor;
+        ctx.font = '14px -apple-system, BlinkMacSystemFont, sans-serif';
+        ctx.textAlign = 'center';
+        
+        // Показываем специальное сообщение для ошибки биллинга
+        if (error.type === 'BILLING_REQUIRED') {
+            ctx.fillText('Для просмотра метрик необходимо', canvas.width / 2, canvas.height / 2 - 20);
+            ctx.fillText('включить биллинг в Google Cloud Console', canvas.width / 2, canvas.height / 2 + 10);
+        } else {
+            const errorMsg = error.message || 'Ошибка загрузки данных';
+            ctx.fillText(`Ошибка: ${errorMsg}`, canvas.width / 2, canvas.height / 2);
+        }
+    }
 }
 
 // ================================
 // Line Chart Drawing Function (Apple Style)
 // ================================
 
-function drawLineChart(ctx, canvas, labels, reads, writes, deletes, isHourly) {
+function drawLineChart(ctx, canvas, labels, reads, writes, deletes, isHourly, hoveredIndex = -1) {
     // Calculate max value for scaling
     const allValues = [...reads, ...writes, ...deletes];
     const maxValue = Math.max(...allValues, 1);
@@ -1268,6 +1316,68 @@ function drawLineChart(ctx, canvas, labels, reads, writes, deletes, isHourly) {
     drawLine(ctx, writes, writeColor, baseY);
     drawLine(ctx, reads, readColor, baseY);
     
+    // Draw hover indicator (vertical line and highlighted points)
+    if (hoveredIndex >= 0 && hoveredIndex < labels.length) {
+        const hoverX = leftPadding + hoveredIndex * stepX;
+        
+        // Draw vertical line
+        ctx.strokeStyle = 'rgba(60, 60, 67, 0.4)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(hoverX, topPadding);
+        ctx.lineTo(hoverX, baseY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        
+        // Highlight points for this index
+        const hoverPoints = [];
+        if (reads[hoveredIndex] > 0) {
+            hoverPoints.push({
+                x: hoverX,
+                y: baseY - (reads[hoveredIndex] / yAxisMax) * chartHeight,
+                color: readColor
+            });
+        }
+        if (writes[hoveredIndex] > 0) {
+            hoverPoints.push({
+                x: hoverX,
+                y: baseY - (writes[hoveredIndex] / yAxisMax) * chartHeight,
+                color: writeColor
+            });
+        }
+        if (deletes[hoveredIndex] > 0) {
+            hoverPoints.push({
+                x: hoverX,
+                y: baseY - (deletes[hoveredIndex] / yAxisMax) * chartHeight,
+                color: deleteColor
+            });
+        }
+        
+        // Draw highlighted points
+        hoverPoints.forEach(point => {
+            // Outer glow
+            ctx.fillStyle = point.color;
+            ctx.globalAlpha = 0.3;
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, 8, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Point
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = point.color;
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, 5, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // White center
+            ctx.fillStyle = '#FFFFFF';
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+        });
+    }
+    
     // Draw X-axis line
     ctx.strokeStyle = gridColor;
     ctx.lineWidth = 1;
@@ -1299,6 +1409,171 @@ function drawLineChart(ctx, canvas, labels, reads, writes, deletes, isHourly) {
             ctx.fillText(label.toString(), x, baseY + 8);
         }
     });
+}
+
+// ================================
+// Chart Tooltip Setup
+// ================================
+
+function setupChartTooltip(canvas, tooltipId, labels, reads, writes, deletes, isHourly) {
+    const tooltip = document.getElementById(tooltipId);
+    if (!tooltip || !canvas) return;
+    
+    // Store chart data on canvas for tooltip
+    canvas._tooltipData = { labels, reads, writes, deletes, isHourly };
+    
+    // Remove existing event listeners
+    canvas.removeEventListener('mousemove', canvas._tooltipHandler);
+    canvas.removeEventListener('mouseleave', canvas._tooltipLeaveHandler);
+    canvas.removeEventListener('mouseenter', canvas._tooltipEnterHandler);
+    
+    // Chart dimensions (must match drawLineChart)
+    const leftPadding = 60;
+    const rightPadding = 20;
+    const topPadding = 30;
+    const bottomPadding = 50;
+    
+    // Track hover state
+    let hoveredIndex = -1;
+    
+    canvas._tooltipEnterHandler = () => {
+        // Redraw chart with hover indicator when entering
+        const data = canvas._tooltipData;
+        if (data) {
+            drawLineChartWithHover(canvas, data.labels, data.reads, data.writes, data.deletes, data.isHourly, -1);
+        }
+    };
+    
+    canvas._tooltipHandler = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        // Check if mouse is in chart area
+        if (x < leftPadding || x > canvas.width - rightPadding || 
+            y < topPadding || y > canvas.height - bottomPadding) {
+            tooltip.style.display = 'none';
+            hoveredIndex = -1;
+            // Redraw without hover
+            const data = canvas._tooltipData;
+            if (data) {
+                drawLineChartWithHover(canvas, data.labels, data.reads, data.writes, data.deletes, data.isHourly, -1);
+            }
+            return;
+        }
+        
+        // Calculate which data point is closest
+        const chartWidth = canvas.width - leftPadding - rightPadding;
+        const dataPoints = labels.length;
+        const stepX = chartWidth / (dataPoints - 1 || 1);
+        
+        // Find closest data point
+        let closestIndex = 0;
+        let minDistance = Infinity;
+        
+        for (let i = 0; i < dataPoints; i++) {
+            const pointX = leftPadding + i * stepX;
+            const distance = Math.abs(x - pointX);
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestIndex = i;
+            }
+        }
+        
+        // Only show tooltip if close enough (within 40px of point)
+        if (minDistance > 40) {
+            tooltip.style.display = 'none';
+            if (hoveredIndex !== -1) {
+                hoveredIndex = -1;
+                const data = canvas._tooltipData;
+                if (data) {
+                    drawLineChartWithHover(canvas, data.labels, data.reads, data.writes, data.deletes, data.isHourly, -1);
+                }
+            }
+            return;
+        }
+        
+        // Update hover indicator if index changed
+        if (hoveredIndex !== closestIndex) {
+            hoveredIndex = closestIndex;
+            const data = canvas._tooltipData;
+            if (data) {
+                drawLineChartWithHover(canvas, data.labels, data.reads, data.writes, data.deletes, data.isHourly, closestIndex);
+            }
+        }
+        
+        // Get data for this point
+        const label = labels[closestIndex];
+        const readValue = reads[closestIndex] || 0;
+        const writeValue = writes[closestIndex] || 0;
+        const deleteValue = deletes[closestIndex] || 0;
+        
+        // Format label
+        let title = '';
+        if (isHourly) {
+            const hour = typeof label === 'number' ? label : parseInt(label);
+            const hourStr = String(hour).padStart(2, '0') + ':00';
+            title = hourStr;
+        } else {
+            title = label;
+        }
+        
+        // Build tooltip HTML
+        tooltip.innerHTML = `
+            <div class="chart-tooltip-title">${title}</div>
+            <div class="chart-tooltip-item">
+                <span class="chart-tooltip-color" style="background: #007AFF;"></span>
+                <span class="chart-tooltip-label">Reads:</span>
+                <span class="chart-tooltip-value">${readValue.toLocaleString('ru-RU')}</span>
+            </div>
+            <div class="chart-tooltip-item">
+                <span class="chart-tooltip-color" style="background: #34C759;"></span>
+                <span class="chart-tooltip-label">Writes:</span>
+                <span class="chart-tooltip-value">${writeValue.toLocaleString('ru-RU')}</span>
+            </div>
+            <div class="chart-tooltip-item">
+                <span class="chart-tooltip-color" style="background: #FF3B30;"></span>
+                <span class="chart-tooltip-label">Deletes:</span>
+                <span class="chart-tooltip-value">${deleteValue.toLocaleString('ru-RU')}</span>
+            </div>
+        `;
+        
+        // Position tooltip
+        const pointX = leftPadding + closestIndex * stepX;
+        
+        // Calculate tooltip position relative to container
+        const container = canvas.parentElement;
+        const containerRect = container.getBoundingClientRect();
+        const canvasRect = canvas.getBoundingClientRect();
+        
+        const relativeX = (canvasRect.left - containerRect.left) + pointX;
+        const relativeY = (canvasRect.top - containerRect.top) + topPadding;
+        
+        tooltip.style.left = relativeX + 'px';
+        tooltip.style.top = relativeY + 'px';
+        tooltip.style.display = 'block';
+    };
+    
+    canvas._tooltipLeaveHandler = () => {
+        tooltip.style.display = 'none';
+        hoveredIndex = -1;
+        // Redraw without hover
+        const data = canvas._tooltipData;
+        if (data) {
+            drawLineChartWithHover(canvas, data.labels, data.reads, data.writes, data.deletes, data.isHourly, -1);
+        }
+    };
+    
+    // Add event listeners
+    canvas.addEventListener('mousemove', canvas._tooltipHandler);
+    canvas.addEventListener('mouseleave', canvas._tooltipLeaveHandler);
+    canvas.addEventListener('mouseenter', canvas._tooltipEnterHandler);
+}
+
+// Wrapper function to redraw chart with hover indicator
+function drawLineChartWithHover(canvas, labels, reads, writes, deletes, isHourly, hoveredIndex) {
+    const ctx = canvas.getContext('2d');
+    drawLineChart(ctx, canvas, labels, reads, writes, deletes, isHourly, hoveredIndex);
 }
 
 // Render collections list (Apple style)
