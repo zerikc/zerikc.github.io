@@ -902,36 +902,67 @@ section {
 
 .app-detail-section {
     min-height: 400px;
-    transition: all var(--transition-normal);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .app-detail-section.hidden {
-    display: none;
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+    max-height: 0;
+    min-height: 0;
+    overflow: hidden;
 }
 
 .app-detail-card {
-    background: rgba(28, 28, 30, 0.9);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: rgba(28, 28, 30, 0.95);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
     border-radius: var(--radius-lg);
     padding: var(--spacing-xl);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(0, 122, 255, 0.2);
     opacity: 0;
-    transform: translateY(20px);
-    transition: all var(--transition-normal);
+    transform: translateY(30px) scale(0.95);
+    transition: opacity 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+                transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+                border-color 0.3s ease;
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     z-index: 1;
+    will-change: opacity, transform;
+    pointer-events: none;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 .app-detail-card.active {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
     position: relative;
     z-index: 2;
+    pointer-events: auto;
+    will-change: auto;
+    border-color: var(--primary-color);
+    box-shadow: 0 24px 80px rgba(0, 122, 255, 0.2);
+    animation: cardAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes cardAppear {
+    0% {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    60% {
+        transform: translateY(-5px) scale(1.02);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .app-detail-header {
@@ -1003,7 +1034,7 @@ section {
     border-radius: var(--radius-md);
     padding: var(--spacing-md);
     border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: all var(--transition-normal);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: visible;
     display: flex;
@@ -1015,12 +1046,15 @@ section {
     pointer-events: auto !important;
     user-select: none;
     z-index: 10;
+    will-change: transform, border-color, background;
 }
 
 .app-mini-card.active {
     border-color: var(--primary-color);
-    background: rgba(0, 122, 255, 0.1);
-    transform: translateY(-4px);
+    background: rgba(0, 122, 255, 0.15);
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 12px 32px rgba(0, 122, 255, 0.3);
+    border-width: 2px;
 }
 
 [data-theme="light"] .app-mini-card.active {
@@ -1034,8 +1068,22 @@ section {
 }
 
 .app-mini-card:hover {
-    transform: translateY(-2px);
-    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-4px) scale(1.02);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 24px rgba(0, 122, 255, 0.15);
+    background: rgba(28, 28, 30, 0.9);
+}
+
+[data-theme="light"] .app-mini-card:hover {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+@media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) .app-mini-card:hover {
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
 }
 
 .app-mini-card:focus-visible {

@@ -1,27 +1,63 @@
-// ================================
-// Portfolio Site - Main Script
-// ================================
+/**
+ * ================================
+ * Portfolio Site - Main Script
+ * ================================
+ * 
+ * Основной скрипт для портфолио iOS разработчика.
+ * Управляет всеми интерактивными элементами сайта: карточками приложений,
+ * навигацией, темами, PWA функциональностью и анимациями.
+ * 
+ * @version 1.0.0
+ * @author Zerikc Apps
+ */
 
 (function() {
     'use strict';
 
     // ================================
-    // App Detail Toggle System - MUST be declared first
+    // СИСТЕМА ДЕТАЛЕЙ ПРИЛОЖЕНИЙ
     // ================================
-    
+    // Управление отображением детальной информации о приложениях
+    // ВАЖНО: Должна быть объявлена первой для глобальной доступности
+
+    /** Текущее активное приложение */
     let currentActiveApp = null;
     
+    /**
+     * Показать детальную информацию о приложении
+     * 
+     * @param {string} appId - ID приложения (weather, homie, floralia и т.д.)
+     * 
+     * @example
+     * showAppDetail('floralia');
+     */
     window.showAppDetail = function(appId) {
         const detailSection = document.querySelector('.app-detail-section');
+        const Utils = window.Utils || {};
         
-        document.querySelectorAll('.app-mini-card').forEach(card => {
-            card.classList.remove('active');
-        });
+        // Получаем все карточки для управления состоянием
+        const allMiniCards = document.querySelectorAll('.app-mini-card');
+        const allDetailCards = document.querySelectorAll('.app-detail-card');
         
-        document.querySelectorAll('.app-detail-card').forEach(card => {
-            card.classList.remove('active');
-        });
+        // Анимация закрытия текущей активной карточки
+        if (currentActiveApp) {
+            const currentDetailCard = document.getElementById(`detail-${currentActiveApp}`);
+            const currentMiniCard = document.querySelector(`[data-app="${currentActiveApp}"]`);
+            
+            // Плавное исчезновение детальной карточки
+            if (currentDetailCard && Utils.fadeOut) {
+                Utils.fadeOut(currentDetailCard, { duration: 200 }).then(() => {
+                    currentDetailCard.classList.remove('active');
+                });
+            } else {
+                currentDetailCard?.classList.remove('active');
+            }
+            
+            // Деактивация мини-карточки
+            currentMiniCard?.classList.remove('active');
+        }
         
+        // Если кликнули на ту же карточку - закрываем детали
         if (currentActiveApp === appId) {
             currentActiveApp = null;
             if (detailSection) {
@@ -30,19 +66,40 @@
             return;
         }
         
+        // Получаем элементы новой активной карточки
         const miniCard = document.querySelector(`[data-app="${appId}"]`);
         const detailCard = document.getElementById(`detail-${appId}`);
         
         if (miniCard && detailCard) {
-            miniCard.classList.add('active');
-            detailCard.classList.add('active');
-            currentActiveApp = appId;
+            // Показываем секцию деталей с анимацией
+            if (detailSection) {
+                detailSection.classList.remove('hidden');
+                // Принудительный reflow для запуска CSS анимации
+                detailSection.offsetHeight;
+            }
             
-                if (detailSection) {
-                    detailSection.classList.remove('hidden');
-                    
-                    setTimeout(() => {
-                    const navbarHeight = document.getElementById('navbar').offsetHeight;
+            // Активируем мини-карточку с визуальной анимацией
+            miniCard.classList.add('active');
+            
+            // Небольшая задержка для более плавного перехода между карточками
+            setTimeout(() => {
+                // Активируем детальную карточку с плавной анимацией появления
+                detailCard.classList.add('active');
+                currentActiveApp = appId;
+            }, 50);
+            
+            // Плавная прокрутка к детальной секции
+            if (detailSection && Utils.scrollTo) {
+                setTimeout(() => {
+                    Utils.scrollTo(detailSection, {
+                        offset: -80, // Учитываем высоту навигации
+                        behavior: 'smooth'
+                    });
+                }, 100);
+            } else {
+                // Fallback для старых браузеров
+                setTimeout(() => {
+                    const navbarHeight = document.getElementById('navbar')?.offsetHeight || 0;
                     const targetPosition = detailSection.getBoundingClientRect().top + window.pageYOffset - navbarHeight - 20;
                     
                     window.scrollTo({
@@ -51,27 +108,54 @@
                     });
                 }, 100);
             }
+            
+            // Улучшенная доступность: обновление ARIA атрибутов
+            if (Utils.setAriaAttributes) {
+                Utils.setAriaAttributes(detailCard, {
+                    'expanded': 'true',
+                    'hidden': 'false'
+                });
+                Utils.setAriaAttributes(miniCard, {
+                    'expanded': 'true',
+                    'selected': 'true'
+                });
+            }
         }
     };
     
-    // Initialize app detail system
+    /**
+     * Инициализация системы деталей приложений
+     * Настраивает обработчики событий для всех карточек приложений
+     */
     function initAppDetailSystem() {
         const miniCards = document.querySelectorAll('.app-mini-card');
         const detailSection = document.querySelector('.app-detail-section');
         
-        // Hide detail section by default if no app is selected
+        // Скрываем секцию деталей по умолчанию, если нет активного приложения
         if (detailSection && currentActiveApp === null) {
             detailSection.classList.add('hidden');
         }
         
+        // Если карточек нет, выходим
         if (miniCards.length === 0) {
             return;
         }
         
-        // Handle clicks on mini cards
+        // Настройка обработчиков для каждой мини-карточки
         miniCards.forEach((card) => {
             const appId = card.getAttribute('data-app');
             
+            // Улучшенная доступность: установка ARIA атрибутов
+            if (window.Utils && window.Utils.setAriaAttributes) {
+                window.Utils.setAriaAttributes(card, {
+                    'role': 'button',
+                    'tabindex': '0',
+                    'aria-expanded': 'false',
+                    'aria-label': `Показать детали приложения ${appId}`
+                });
+            }
+            
+            // Обработчик клика по карточке
             card.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -79,11 +163,21 @@
                     showAppDetail(appId);
                 }
             });
+            
+            // Навигация с клавиатуры (Enter или Space)
+            card.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    if (appId) {
+                        showAppDetail(appId);
+                    }
+                }
+            });
         });
         
+        // Обработчики для стрелок раскрытия
         const expandArrows = document.querySelectorAll('.expand-arrow');
         
-        // Handle clicks on expand arrows specifically
         expandArrows.forEach((arrow) => {
             arrow.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -100,21 +194,27 @@
     }
 
     // ================================
-    // PWA - Service Worker Registration
+    // PWA - SERVICE WORKER И УСТАНОВКА
     // ================================
-    
+    // Функциональность Progressive Web App
+
+    /** Сохраненное событие установки PWA */
     let deferredPrompt;
     const installButton = document.getElementById('installButton');
     
-    // Logger utility is loaded from logger.js
-    // Use window.logger if available, otherwise create a safe fallback
+    /**
+     * Логгер для безопасного логирования
+     * Использует window.logger если доступен, иначе создает fallback
+     */
     const logger = window.logger || {
         log: () => {},
         error: (...args) => console.error(...args),
         warn: () => {}
     };
     
-    // Регистрация Service Worker
+    /**
+     * Регистрация Service Worker для офлайн функциональности
+     */
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker
@@ -127,12 +227,12 @@
                         registration.update();
                     }, 60000);
                     
-                    // Обработка обновлений
+                    // Обработка обнаружения новых версий Service Worker
                     registration.addEventListener('updatefound', () => {
                         const newWorker = registration.installing;
                         newWorker.addEventListener('statechange', () => {
                             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                // Показать уведомление о доступном обновлении
+                                // Показываем уведомление о доступном обновлении
                                 showUpdateNotification();
                             }
                         });
@@ -144,7 +244,10 @@
         });
     }
     
-    // Обработка события установки PWA
+    /**
+     * Обработка события установки PWA
+     * Перехватываем стандартный промпт и показываем свою кнопку
+     */
     window.addEventListener('beforeinstallprompt', (e) => {
         logger.log('💾 Install prompt fired');
         // Предотвращаем автоматический показ промпта
@@ -157,7 +260,9 @@
         }
     });
     
-    // Обработка клика по кнопке установки
+    /**
+     * Обработка клика по кнопке установки PWA
+     */
     if (installButton) {
         installButton.addEventListener('click', async () => {
             if (!deferredPrompt) {
@@ -165,7 +270,7 @@
                 return;
             }
             
-            // Показываем промпт установки
+            // Показываем нативный промпт установки
             deferredPrompt.prompt();
             
             // Ждем выбора пользователя
@@ -180,12 +285,14 @@
                 logger.log('❌ User dismissed the install prompt');
             }
             
-            // Очищаем сохраненный промпт
+            // Очищаем сохраненное событие
             deferredPrompt = null;
         });
     }
     
-    // Отслеживание успешной установки
+    /**
+     * Отслеживание успешной установки PWA
+     */
     window.addEventListener('appinstalled', (evt) => {
         logger.log('🎉 App installed successfully');
         
@@ -194,10 +301,10 @@
             installButton.style.display = 'none';
         }
         
-        // Показываем уведомление
+        // Показываем уведомление об успешной установке
         showInstallSuccessMessage();
         
-        // Отправляем событие в аналитику (если есть)
+        // Отправляем событие в аналитику (если настроена)
         if (window.gtag) {
             gtag('event', 'pwa_installed', {
                 event_category: 'PWA',
@@ -206,7 +313,9 @@
         }
     });
     
-    // Функция для показа уведомления об обновлении
+    /**
+     * Показать уведомление о доступном обновлении
+     */
     function showUpdateNotification() {
         const notification = document.createElement('div');
         notification.innerHTML = `
@@ -245,13 +354,15 @@
         
         document.body.appendChild(notification);
         
-        // Автоматически убираем через 10 секунд
+        // Автоматически убираем уведомление через 10 секунд
         setTimeout(() => {
             notification.remove();
         }, 10000);
     }
     
-    // Функция для показа сообщения об успешной установке
+    /**
+     * Показать сообщение об успешной установке PWA
+     */
     function showInstallSuccessMessage() {
         const message = document.createElement('div');
         message.textContent = '🎉 Приложение успешно установлено!';
@@ -273,40 +384,55 @@
         
         document.body.appendChild(message);
         
+        // Автоматически скрываем через 3 секунды
         setTimeout(() => {
             message.style.animation = 'slideDown 0.3s ease';
             setTimeout(() => message.remove(), 300);
         }, 3000);
     }
     
-    // Проверка, установлено ли приложение
+    /**
+     * Проверка, установлено ли приложение
+     * Скрываем кнопку установки, если приложение уже установлено
+     */
     if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
         logger.log('✅ Running in standalone mode');
-        // Скрываем кнопку установки, если уже установлено
         if (installButton) {
             installButton.style.display = 'none';
         }
     }
 
     // ================================
-    // Theme Management
+    // УПРАВЛЕНИЕ ТЕМОЙ
     // ================================
-    
-    // Initialize theme on page load
+    // Переключение между светлой и темной темой
+
+    /**
+     * Инициализация темы при загрузке страницы
+     * Проверяет сохраненную тему или предпочтения системы
+     */
     function initTheme() {
         const savedTheme = localStorage.getItem('theme');
         const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         
         if (savedTheme) {
+            // Используем сохраненную тему
             setTheme(savedTheme, false);
         } else if (!systemPrefersDark) {
+            // Используем светлую тему по умолчанию
             setTheme('light', false);
         } else {
+            // Используем темную тему по умолчанию
             setTheme('dark', false);
         }
     }
     
-    // Set theme
+    /**
+     * Установить тему
+     * 
+     * @param {string} theme - Название темы ('light' или 'dark')
+     * @param {boolean} save - Сохранять ли тему в localStorage (по умолчанию: true)
+     */
     function setTheme(theme, save = true) {
         document.documentElement.setAttribute('data-theme', theme);
         if (save) {
@@ -314,43 +440,50 @@
         }
     }
     
-    // Toggle theme
+    /**
+     * Переключить тему (светлая ↔ темная)
+     */
     function toggleTheme() {
         const currentTheme = document.documentElement.getAttribute('data-theme');
         const newTheme = currentTheme === 'light' ? 'dark' : 'light';
         setTheme(newTheme);
     }
     
-    // Listen for system theme changes
+    /**
+     * Слушатель изменений системной темы
+     * Обновляет тему, если пользователь не выбрал тему вручную
+     */
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
         if (!localStorage.getItem('theme')) {
             setTheme(e.matches ? 'dark' : 'light', false);
         }
     });
     
-    // Initialize theme immediately
+    // Инициализация темы сразу при загрузке
     initTheme();
     
-    // Theme toggle button
+    // Обработчик кнопки переключения темы
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
         themeToggle.addEventListener('click', toggleTheme);
     }
 
     // ================================
-    // Mobile Navigation Toggle
+    // МОБИЛЬНАЯ НАВИГАЦИЯ
     // ================================
-    
+    // Управление мобильным меню
+
     const navToggle = document.getElementById('navToggle');
     const navMenu = document.getElementById('navMenu');
     const navLinks = document.querySelectorAll('.nav-link');
     
     if (navToggle && navMenu) {
+        // Переключение мобильного меню
         navToggle.addEventListener('click', () => {
             navToggle.classList.toggle('active');
             navMenu.classList.toggle('active');
             
-            // Prevent body scroll when menu is open
+            // Блокируем прокрутку страницы, когда меню открыто
             if (navMenu.classList.contains('active')) {
                 document.body.style.overflow = 'hidden';
             } else {
@@ -358,7 +491,7 @@
             }
         });
         
-        // Close menu when clicking on a link
+        // Закрытие меню при клике на ссылку
         navLinks.forEach(link => {
             link.addEventListener('click', () => {
                 navToggle.classList.remove('active');
@@ -367,7 +500,7 @@
             });
         });
         
-        // Close menu when clicking outside
+        // Закрытие меню при клике вне его области
         document.addEventListener('click', (e) => {
             if (!navToggle.contains(e.target) && !navMenu.contains(e.target)) {
                 navToggle.classList.remove('active');
@@ -378,15 +511,17 @@
     }
     
     // ================================
-    // Navbar Scroll Effect
+    // ЭФФЕКТ НАВИГАЦИИ ПРИ ПРОКРУТКЕ
     // ================================
-    
+    // Изменение стиля навигации при прокрутке страницы
+
     const navbar = document.getElementById('navbar');
     let lastScroll = 0;
     
     window.addEventListener('scroll', () => {
         const currentScroll = window.pageYOffset;
         
+        // Добавляем класс 'scrolled' при прокрутке более 50px
         if (currentScroll > 50) {
             navbar.classList.add('scrolled');
         } else {
@@ -397,20 +532,22 @@
     });
     
     // ================================
-    // Smooth Scroll for Navigation Links
+    // ПЛАВНАЯ ПРОКРУТКА ДЛЯ НАВИГАЦИИ
     // ================================
-    
+    // Плавная прокрутка к секциям при клике на ссылки
+
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             const href = this.getAttribute('href');
             
-            // Don't prevent default for empty hrefs
+            // Пропускаем пустые ссылки
             if (href === '#' || !href) return;
             
             const target = document.querySelector(href);
             if (target) {
                 e.preventDefault();
                 
+                // Учитываем высоту навигации при прокрутке
                 const navbarHeight = navbar.offsetHeight;
                 const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navbarHeight;
                 
@@ -423,44 +560,46 @@
     });
     
     // ================================
-    // Intersection Observer for Animations
+    // АНИМАЦИИ ПРИ ПОЯВЛЕНИИ В VIEWPORT
     // ================================
-    
+    // Использование Intersection Observer для анимации элементов при скролле
+
     const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -80px 0px'
+        threshold: 0.1, // Элемент считается видимым при 10% видимости
+        rootMargin: '0px 0px -80px 0px' // Запуск анимации за 80px до появления
     };
     
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('animated');
+                // Прекращаем наблюдение после анимации
                 observer.unobserve(entry.target);
             }
         });
     }, observerOptions);
     
-    // Animate app cards with stagger effect
+    // Анимация карточек приложений с эффектом stagger
     document.querySelectorAll('.app-card').forEach((card, index) => {
         card.setAttribute('data-animate', '');
         card.style.transitionDelay = `${index * 0.1}s`;
         observer.observe(card);
     });
     
-    // Animate contact cards
+    // Анимация карточек контактов
     document.querySelectorAll('.contact-card').forEach((card, index) => {
         card.setAttribute('data-animate', '');
         card.style.transitionDelay = `${index * 0.15}s`;
         observer.observe(card);
     });
     
-    // Animate section headers
+    // Анимация заголовков секций
     document.querySelectorAll('.section-header').forEach(header => {
         header.setAttribute('data-animate', '');
         observer.observe(header);
     });
     
-    // Animate hero content
+    // Анимация элементов hero секции
     const heroContent = document.querySelector('.hero-content');
     if (heroContent) {
         const heroElements = heroContent.querySelectorAll('.hero-title, .hero-description, .hero-buttons');
@@ -472,9 +611,10 @@
     }
     
     // ================================
-    // Contact Form Handling
+    // ОБРАБОТКА ФОРМЫ КОНТАКТОВ
     // ================================
-    
+    // Отправка формы контактов (если используется)
+
     const contactForm = document.getElementById('contactForm');
     const formMessage = document.getElementById('formMessage');
     
@@ -485,12 +625,12 @@
             const formData = new FormData(contactForm);
             const submitButton = contactForm.querySelector('button[type="submit"]');
             
-            // Disable submit button
+            // Блокируем кнопку отправки
             submitButton.disabled = true;
             submitButton.textContent = 'Отправка...';
             
             try {
-                // If using Formspree or similar service
+                // Отправка формы (например, через Formspree)
                 const response = await fetch(contactForm.action, {
                     method: 'POST',
                     body: formData,
@@ -509,19 +649,25 @@
                 showFormMessage('error', 'Упс! Что-то пошло не так. Пожалуйста, попробуйте отправить письмо напрямую на email.');
                 logger.error('Form submission error:', error);
             } finally {
-                // Re-enable submit button
+                // Разблокируем кнопку отправки
                 submitButton.disabled = false;
                 submitButton.textContent = 'Отправить сообщение';
             }
         });
     }
     
+    /**
+     * Показать сообщение формы
+     * 
+     * @param {string} type - Тип сообщения ('success' или 'error')
+     * @param {string} message - Текст сообщения
+     */
     function showFormMessage(type, message) {
         if (formMessage) {
             formMessage.textContent = message;
             formMessage.className = 'form-message ' + type;
             
-            // Auto-hide message after 5 seconds
+            // Автоматически скрываем сообщение через 5 секунд
             setTimeout(() => {
                 formMessage.className = 'form-message';
             }, 5000);
@@ -529,11 +675,15 @@
     }
     
     // ================================
-    // Scroll Progress Bar
+    // ИНДИКАТОР ПРОГРЕССА ПРОКРУТКИ
     // ================================
-    
+    // Визуальная полоса прогресса прокрутки страницы
+
     const scrollProgress = document.getElementById('scrollProgress');
     
+    /**
+     * Обновление индикатора прогресса прокрутки
+     */
     function updateScrollProgress() {
         const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
         const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
@@ -545,27 +695,32 @@
     }
     
     // ================================
-    // Section References
+    // НАВИГАЦИЯ ПО СЕКЦИЯМ
     // ================================
-    
+    // Управление активными точками навигации
+
     const sections = document.querySelectorAll('section[id]');
     const dots = document.querySelectorAll('.dot');
     
     // ================================
-    // Parallax Effect for Gradient Orbs
+    // ПАРАЛЛАКС ЭФФЕКТ ДЛЯ ГРАДИЕНТНЫХ ОРБОВ
     // ================================
-    
+    // Интерактивное движение градиентных орбов при движении мыши
+
     const gradientOrbs = document.querySelectorAll('.gradient-orb');
     const heroSection = document.querySelector('.hero');
     
     if (heroSection) {
+        // Движение орбов при движении мыши
         heroSection.addEventListener('mousemove', (e) => {
             const { clientX, clientY } = e;
             const { innerWidth, innerHeight } = window;
             
+            // Вычисляем относительную позицию мыши
             const xPos = (clientX / innerWidth) - 0.5;
             const yPos = (clientY / innerHeight) - 0.5;
             
+            // Применяем движение к каждому орбу с разной скоростью
             gradientOrbs.forEach((orb, index) => {
                 const speed = (index + 1) * 20;
                 const x = xPos * speed;
@@ -575,6 +730,7 @@
             });
         });
         
+        // Возврат орбов в исходное положение при уходе мыши
         heroSection.addEventListener('mouseleave', () => {
             gradientOrbs.forEach(orb => {
                 orb.style.transform = 'translate(0, 0)';
@@ -583,9 +739,13 @@
     }
     
     // ================================
-    // Active Navigation Link Highlighting
+    // ПОДСВЕТКА АКТИВНОЙ НАВИГАЦИИ
     // ================================
-    
+    // Изменение стиля активной ссылки навигации при прокрутке
+
+    /**
+     * Подсветка активной ссылки навигации в зависимости от текущей секции
+     */
     function highlightNavigation() {
         const scrollY = window.pageYOffset;
         
@@ -596,6 +756,7 @@
             const navLink = document.querySelector(`.nav-link[href="#${sectionId}"]`);
             
             if (navLink) {
+                // Подсвечиваем ссылку, если секция в viewport
                 if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
                     navLink.style.color = 'var(--text-primary)';
                 } else {
@@ -605,14 +766,13 @@
         });
     }
     
-    // Moved to optimized scroll handler above
-    
     // ================================
-    // Keyboard Navigation
+    // НАВИГАЦИЯ С КЛАВИАТУРЫ
     // ================================
-    
+    // Закрытие мобильного меню по клавише Escape
+
     document.addEventListener('keydown', (e) => {
-        // Close mobile menu with Escape key
+        // Закрытие мобильного меню по клавише Escape
         if (e.key === 'Escape' && navMenu.classList.contains('active')) {
             navToggle.classList.remove('active');
             navMenu.classList.remove('active');
@@ -621,68 +781,75 @@
     });
     
     // ================================
-    // Lazy Loading for Images
+    // ЛЕНИВАЯ ЗАГРУЗКА ИЗОБРАЖЕНИЙ
     // ================================
-    
+    // Загрузка изображений только при появлении в viewport
+
     if ('IntersectionObserver' in window) {
         const imageObserver = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const img = entry.target;
+                    // Загружаем изображение из data-src
                     if (img.dataset.src) {
                         img.src = img.dataset.src;
                         img.removeAttribute('data-src');
+                        // Прекращаем наблюдение после загрузки
                         imageObserver.unobserve(img);
                     }
                 }
             });
         });
         
+        // Наблюдаем за всеми изображениями с атрибутом data-src
         document.querySelectorAll('img[data-src]').forEach(img => {
             imageObserver.observe(img);
         });
     }
     
     // ================================
-    // Performance: Debounce Function
+    // ОПТИМИЗИРОВАННЫЙ ОБРАБОТЧИК ПРОКРУТКИ
     // ================================
+    // Объединение всех обработчиков прокрутки для производительности
+    // Использование RequestAnimationFrame и throttle для плавности
+
+    const Utils = window.Utils || {};
     
-    function debounce(func, wait = 10, immediate = true) {
-        let timeout;
-        return function() {
-            const context = this;
-            const args = arguments;
-            const later = function() {
-                timeout = null;
-                if (!immediate) func.apply(context, args);
-            };
-            const callNow = immediate && !timeout;
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-            if (callNow) func.apply(context, args);
+    /**
+     * Fallback для throttle, если Utils не загружен
+     */
+    const throttleScroll = Utils.throttle || ((fn, delay) => {
+        let lastCall = 0;
+        return function(...args) {
+            const now = Date.now();
+            if (now - lastCall >= delay) {
+                lastCall = now;
+                fn.apply(this, args);
+            }
         };
-    }
+    });
     
-    // ================================
-    // Optimized Scroll Handler (RAF)
-    // ================================
-    // Объединяем все scroll обработчики в один для производительности
     let scrollTicking = false;
+    
+    /**
+     * Основной обработчик прокрутки
+     * Объединяет все операции, связанные с прокруткой
+     */
     function handleScroll() {
         if (!scrollTicking) {
             window.requestAnimationFrame(() => {
                 const scrolled = window.pageYOffset || window.scrollY || document.documentElement.scrollTop;
                 
-                // Обновление прогресса прокрутки
+                // Обновление индикатора прогресса прокрутки
                 updateScrollProgress();
                 
-                // Обновление активной навигации
+                // Обновление подсветки активной навигации
                 highlightNavigation();
                 
-                // Обновление активных точек
+                // Обновление активных точек навигации
                 updateActiveDot();
                 
-                // Затемнение фона героя при скролле
+                // Затемнение фона hero секции при прокрутке
                 const heroOverlay = document.getElementById('heroBackgroundOverlay');
                 if (heroOverlay) {
                     const heroSection = document.querySelector('.hero');
@@ -690,16 +857,17 @@
                         const heroHeight = heroSection.offsetHeight;
                         const scrollProgress = Math.min(scrolled / heroHeight, 1);
                         
-                        // Затемняем от 0 до 0.6 (60% затемнение)
+                        // Затемнение от 0 до 60%
                         const darkOpacity = scrollProgress * 0.6;
                         
+                        // Выбор цвета overlay в зависимости от темы
                         if (document.documentElement.getAttribute('data-theme') === 'light' || 
                             (!document.documentElement.getAttribute('data-theme') && 
                              window.matchMedia('(prefers-color-scheme: light)').matches)) {
-                            // Для светлой темы используем белый overlay
+                            // Белый overlay для светлой темы
                             heroOverlay.style.background = `rgba(255, 255, 255, ${darkOpacity})`;
                         } else {
-                            // Для темной темы используем черный overlay
+                            // Черный overlay для темной темы
                             heroOverlay.style.background = `rgba(0, 0, 0, ${darkOpacity})`;
                         }
                     }
@@ -710,21 +878,26 @@
             scrollTicking = true;
         }
     }
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // Применяем throttle для дополнительной оптимизации (~60fps)
+    const optimizedHandleScroll = throttleScroll(handleScroll, 16);
+    window.addEventListener('scroll', optimizedHandleScroll, { passive: true });
     
     // ================================
-    // Scroll Chevron
+    // СТРЕЛКА ПРОКРУТКИ ВНИЗ
     // ================================
-    
+    // Интерактивная стрелка для прокрутки к секции приложений
+
     const scrollChevron = document.querySelector('.scroll-chevron');
     
     if (scrollChevron) {
-        // Hide chevron on scroll - используем RAF для оптимизации
+        // Скрытие стрелки при прокрутке (оптимизировано через RAF)
         let chevronTicking = false;
         window.addEventListener('scroll', () => {
             if (!chevronTicking) {
                 window.requestAnimationFrame(() => {
                     const scrolled = window.pageYOffset || window.scrollY || document.documentElement.scrollTop;
+                    // Скрываем стрелку после прокрутки более 300px
                     if (scrolled > 300) {
                         scrollChevron.classList.add('hidden');
                     } else {
@@ -736,7 +909,7 @@
             }
         }, { passive: true });
         
-        // Scroll to apps section on click
+        // Прокрутка к секции приложений при клике на стрелку
         scrollChevron.addEventListener('click', () => {
             const appsSection = document.getElementById('apps');
             if (appsSection) {
@@ -752,18 +925,22 @@
     }
     
     // ================================
-    // Section Dots Navigation
+    // НАВИГАЦИЯ ТОЧКАМИ ПО СЕКЦИЯМ
     // ================================
-    
-    // Update active dot on scroll
+    // Управление активными точками боковой навигации
+
+    /**
+     * Обновление активной точки навигации при прокрутке
+     */
     function updateActiveDot() {
-        const scrollY = window.pageYOffset + 200;
+        const scrollY = window.pageYOffset + 200; // Смещение для раннего переключения
         
         sections.forEach(section => {
             const sectionTop = section.offsetTop;
             const sectionHeight = section.offsetHeight;
             const sectionId = section.getAttribute('id');
             
+            // Активируем точку, если секция в viewport
             if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
                 dots.forEach(dot => {
                     dot.classList.remove('active');
@@ -775,7 +952,7 @@
         });
     }
     
-    // Smooth scroll on dot click
+    // Плавная прокрутка при клике на точку навигации
     dots.forEach(dot => {
         dot.addEventListener('click', (e) => {
             e.preventDefault();
@@ -794,16 +971,15 @@
         });
     });
     
-    // Moved to optimized scroll handler above
-    
     // ================================
-    // Page Load Animation
+    // АНИМАЦИЯ ЗАГРУЗКИ СТРАНИЦЫ
     // ================================
-    
+    // Плавное появление контента при загрузке
+
     window.addEventListener('load', () => {
         document.body.classList.add('loaded');
         
-        // Add fade-in effect to body
+        // Плавное появление body
         document.body.style.opacity = '0';
         document.body.style.transition = 'opacity 0.5s ease';
         
@@ -811,21 +987,22 @@
             document.body.style.opacity = '1';
         }, 100);
         
-        // Initialize app detail system
+        // Инициализация системы деталей приложений
         setTimeout(() => {
             initAppDetailSystem();
         }, 500);
         
-        // Trigger initial animations
+        // Запуск начальных анимаций
         highlightNavigation();
         updateScrollProgress();
     });
     
     // ================================
-    // Console Easter Egg
+    // ПАСХАЛКА В КОНСОЛИ
     // ================================
-    
-    // Console Easter Egg (only in development)
+    // Приветственное сообщение для разработчиков
+
+    // Показываем пасхалку только в режиме разработки
     if (window.logger && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.search.includes('debug=true'))) {
         window.logger.log('%c👋 Привет, любопытный разработчик!', 'font-size: 20px; font-weight: bold; color: #007AFF;');
         window.logger.log('%cЕсли ты ищешь талантливого iOS разработчика, напиши мне!', 'font-size: 14px; color: #98989D;');
@@ -833,17 +1010,18 @@
     }
     
     // ================================
-    // Utility: Copy Email on Click
+    // УТИЛИТА: КОПИРОВАНИЕ EMAIL
     // ================================
-    
+    // Копирование email в буфер обмена при клике
+
     document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
         link.addEventListener('click', (e) => {
             const email = link.textContent;
             
-            // Try to copy to clipboard
+            // Попытка скопировать email в буфер обмена
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(email).then(() => {
-                    // Show temporary tooltip
+                    // Показываем временное уведомление
                     const tooltip = document.createElement('span');
                     tooltip.textContent = 'Email скопирован!';
                     tooltip.style.cssText = `
@@ -863,6 +1041,7 @@
                     
                     document.body.appendChild(tooltip);
                     
+                    // Удаляем уведомление через 2 секунды
                     setTimeout(() => {
                         tooltip.remove();
                     }, 2000);
@@ -873,7 +1052,11 @@
         });
     });
     
-    // Add slideUp animation
+    // ================================
+    // ДОБАВЛЕНИЕ CSS АНИМАЦИЙ
+    // ================================
+    // Динамическое добавление keyframes для анимаций
+
     const style = document.createElement('style');
     style.textContent = `
         @keyframes slideUp {
@@ -890,4 +1073,3 @@
     document.head.appendChild(style);
     
 })();
-
